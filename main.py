@@ -1,13 +1,16 @@
 import os
 import pandas as pd
-import numpy as np
 import tensorflow as tf
 import time
 import logging
 import coloredlogs
 import requests
+import matplotlib.pyplot as plt
+import matplotlib.animation as animation
+from datetime import datetime
 from typing import Dict
 from utils.model_utils import load_models, make_prediction, preprocess_real_time_data_with_features
+import matplotlib.dates as mdates
 
 # Logging configuration
 logger = logging.getLogger(__name__)
@@ -38,6 +41,42 @@ if gpus:
 # Load models
 logger.info("Loading models...")
 scaler, pca, model = load_models(SCALER_PATH, PCA_PATH, MODEL_PATH)
+
+# Setup for real-time plotting
+fig, ax = plt.subplots(3, 1, figsize=(10, 8))
+
+lines = []
+for i in range(3):
+    line, = ax[i].plot([], [], lw=2)
+    lines.append(line)
+
+ax[0].set_title('Energy Consumed')
+ax[1].set_title('Energy Produced')
+ax[2].set_title('Air Conditioning ON/OFF')
+
+# Set up date formatting for x-axis
+for a in ax:
+    a.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M:%S'))
+    a.xaxis.set_major_locator(mdates.SecondLocator(interval=10))
+    a.relim()
+    a.autoscale_view()
+
+xdata, ydata1, ydata2, ydata3 = [], [], [], []
+
+def init():
+    for line in lines:
+        line.set_data([], [])
+    return lines
+
+def update_plot(frame):
+    for i, ydata in enumerate([ydata1, ydata2, ydata3]):
+        lines[i].set_data(xdata, ydata)
+        ax[i].relim()
+        ax[i].autoscale_view()
+    fig.autofmt_xdate()
+    return lines
+
+ani = animation.FuncAnimation(fig, update_plot, frames=200, init_func=init, blit=True)
 
 def fetch_data_from_api(url: str) -> Dict:
     """
@@ -110,12 +149,30 @@ def main() -> None:
 
         # Preprocess the data
         data_preprocessed = preprocess_real_time_data_with_features(data)
+        
+        ac_on = make_prediction(data_preprocessed, scaler, pca, model, SEQ_LENGTH)
 
         # Make prediction
-        if make_prediction(data_preprocessed, scaler, pca, model, SEQ_LENGTH):
+        if ac_on:
             logger.info("Turn on air conditioning")
         else:
             logger.info("Do not turn on air conditioning")
+
+        # Update real-time plot data
+        current_time = datetime.now()
+        xdata.append(current_time)
+        ydata1.append(data['DE_KN_residential2_grid_import'].iloc[-1])
+        ydata2.append(data['DE_KN_residential1_pv'].iloc[-1])
+        ydata3.append(1 if ac_on else 0)
+
+        # Keep only the last 60 points
+        if len(xdata) > 60:
+            xdata.pop(0)
+            ydata1.pop(0)
+            ydata2.pop(0)
+            ydata3.pop(0)
+
+        plt.pause(1)  # Pause to update the plot
 
         # Wait one minute before the next check
         time.sleep(60)
