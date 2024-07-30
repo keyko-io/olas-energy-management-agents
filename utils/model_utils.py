@@ -76,7 +76,7 @@ def preprocess_real_time_data_with_features(data: pd.DataFrame) -> pd.DataFrame:
     data['DE_KN_residential2_freezer'] = data['DE_KN_residential2_freezer'].diff().fillna(0)
     data['DE_KN_residential2_washing_machine'] = data['DE_KN_residential2_washing_machine'].diff().fillna(0)
     data['DE_KN_residential2_grid_import'] = data['DE_KN_residential2_grid_import'].diff().fillna(0)
-    data['DE_KN_residential1_pv'] = data['DE_KN_residential1_pv']
+    data['DE_KN_residential1_pv'] = data['DE_KN_residential1_pv'].diff().fillna(0)
     data = data.ffill()
 
     features = [
@@ -89,3 +89,17 @@ def preprocess_real_time_data_with_features(data: pd.DataFrame) -> pd.DataFrame:
     ]
 
     return data[features]
+
+def inverse_transform_data(scaled_pca_data: np.ndarray, scaler: StandardScaler, pca: PCA) -> np.ndarray:
+    """
+    Revert the PCA and StandardScaler transformations to get the original scale data.
+
+    :param scaled_pca_data: Numpy array with the scaled and PCA-transformed data.
+    :param scaler: The fitted StandardScaler.
+    :param pca: The fitted PCA model.
+    :return: Numpy array with the data in the original scale.
+    """
+    logger.info("Reverting PCA and scaling transformations")
+    pca_reversed = pca.inverse_transform(scaled_pca_data)
+    original_data = scaler.inverse_transform(pca_reversed)
+    return original_data
