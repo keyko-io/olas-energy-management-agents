@@ -8,6 +8,9 @@ from typing import Tuple
 from utils.transformers import Time2Vector, TransformerBlock
 import logging
 import coloredlogs
+import os
+import matplotlib.pyplot as plt
+from tensorflow.keras import layers, Model # type: ignore
 
 # Logging configuration
 logger = logging.getLogger(__name__)
@@ -103,3 +106,114 @@ def inverse_transform_data(scaled_pca_data: np.ndarray, scaler: StandardScaler, 
     pca_reversed = pca.inverse_transform(scaled_pca_data)
     original_data = scaler.inverse_transform(pca_reversed)
     return original_data
+
+def load_data(file_path):
+    logger.info("Loading data")
+    return pd.read_csv(file_path, parse_dates=['cet_cest_timestamp'], index_col='cet_cest_timestamp')
+
+def preprocess_data(data):
+    logger.info("Preparing data")
+    data['residential2_circulation_pump'] = data['DE_KN_residential2_circulation_pump'].diff().fillna(0)
+    data['residential2_dishwasher'] = data['DE_KN_residential2_dishwasher'].diff().fillna(0)
+    data['residential2_freezer'] = data['DE_KN_residential2_freezer'].diff().fillna(0)
+    data['residential2_washing_machine'] = data['DE_KN_residential2_washing_machine'].diff().fillna(0)
+    data['total_consumption'] = data['DE_KN_residential2_grid_import'].diff().fillna(0)
+    data['total_production'] = data['DE_KN_residential1_pv'].diff().fillna(0)
+    data = data.ffill()
+    
+    X_minutes = 60
+    data['air_conditioning_on'] = 0
+    data.loc[data['total_production'].rolling(window=X_minutes).sum().shift(-X_minutes) > data['total_consumption'].rolling(window=X_minutes).sum().shift(-X_minutes), 'air_conditioning_on'] = 1
+    
+    data['target'] = data['air_conditioning_on']
+    data.dropna(subset=['target'], inplace=True)
+    data['target'] = data['target'].astype(int)  # Convert target to integer
+    
+    return data
+
+def select_features(data):
+    logger.info("Selecting features")
+    features = [
+        'DE_KN_residential2_circulation_pump', 
+        'DE_KN_residential2_dishwasher', 
+        'DE_KN_residential2_freezer', 
+        'DE_KN_residential2_grid_import',
+        'DE_KN_residential2_washing_machine',
+        'DE_KN_residential1_pv'
+    ]
+    return data[features], data['target']
+
+def normalize_data(models_dir, X_train, X_valid, X_test):
+    logger.info("Normalizing data")
+    scaler_path = os.path.join(models_dir, 'scaler.pkl')
+    if os.path.exists(scaler_path):
+        scaler = joblib.load(scaler_path)
+        logger.info(f"Loading scaler from {scaler_path}")
+    else:
+        scaler = StandardScaler()
+        scaler.fit(X_train)
+        joblib.dump(scaler, scaler_path)
+        logger.info(f"Saving scaler to {scaler_path}")
+    X_train = scaler.transform(X_train)
+    X_valid = scaler.transform(X_valid)
+    X_test = scaler.transform(X_test)
+    return X_train, X_valid, X_test
+
+def apply_pca(models_dir, X_train, X_valid, X_test):
+    logger.info("Applying PCA")
+    pca_path = os.path.join(models_dir, 'pca.pkl')
+    if os.path.exists(pca_path):
+        pca = joblib.load(pca_path)
+        logger.info(f"PCA model loaded from {pca_path}")
+    else:
+        pca = PCA(n_components=0.95)  # Retain 95% of variance
+        pca.fit(X_train)
+        joblib.dump(pca, pca_path)
+        logger.info(f"Saved PCA model to {pca_path}")
+    X_train = pca.transform(X_train)
+    X_valid = pca.transform(X_valid)
+    X_test = pca.transform(X_test)
+    return X_train, X_valid, X_test
+
+def remove_nans(X, y):
+    logger.info("Deleting rows with NaN values")
+    mask = ~np.isnan(X).any(axis=1)
+    X = X[mask]
+    y = y[mask]
+    return X, y
+
+def create_tf_dataset(X, y, seq_length, batch_size, dataset_name):
+    logger.info(f"Creating dataset {dataset_name}")
+    X_data, y_data = [], []
+    for i in range(len(X) - seq_length - 1):
+        X_data.append(X[i:(i + seq_length)])
+        y_data.append(y[i + seq_length])
+    X_data, y_data = np.array(X_data), np.array(y_data)
+    with tf.device('/gpu:0'):
+        dataset = tf.data.Dataset.from_tensor_slices((X_data, y_data))
+        dataset = dataset.cache().shuffle(buffer_size=len(X_data)).batch(batch_size).prefetch(buffer_size=tf.data.experimental.AUTOTUNE)
+    return dataset
+
+def build_model(seq_length, input_shape, head_size, num_heads, ff_dim, num_transformer_blocks, mlp_units, dropout, mlp_dropout):
+    inputs = layers.Input(shape=input_shape)
+    time_embedding = Time2Vector(seq_length)(inputs)
+    x = layers.Concatenate(axis=-1)([inputs, time_embedding])
+    x = layers.Dense(head_size, dtype='float32')(x)
+    for _ in range(num_transformer_blocks):
+        x = TransformerBlock(head_size, num_heads, ff_dim, dropout)(x, training=True)
+    x = layers.GlobalAveragePooling1D()(x)
+    for dim in mlp_units:
+        x = layers.Dense(dim, activation="relu")(x)
+        x = layers.Dropout(mlp_dropout)(x)
+    outputs = layers.Dense(1, activation='sigmoid')(x)
+    return Model(inputs, outputs)
+
+def plot_loss(history):
+    logger.info("Plotting training and validation loss")
+    plt.plot(history.history['loss'], label='Train Loss')
+    plt.plot(history.history['val_loss'], label='Validation Loss')
+    plt.xlabel('Epochs')
+    plt.ylabel('Loss')
+    plt.legend()
+    plt.title('Training and Validation Loss')
+    plt.show()
