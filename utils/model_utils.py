@@ -111,39 +111,38 @@ def load_data(file_path):
     logger.info("Loading data")
     return pd.read_csv(file_path, parse_dates=['cet_cest_timestamp'], index_col='cet_cest_timestamp')
 
-def preprocess_data(data):
+def preprocess_data(sub_dfs):
     logger.info("Preparing data")
-    data['residential2_circulation_pump'] = data['DE_KN_residential2_circulation_pump'].diff().fillna(0)
-    data['residential2_dishwasher'] = data['DE_KN_residential2_dishwasher'].diff().fillna(0)
-    data['residential2_freezer'] = data['DE_KN_residential2_freezer'].diff().fillna(0)
-    data['residential2_washing_machine'] = data['DE_KN_residential2_washing_machine'].diff().fillna(0)
-    data['total_consumption'] = data['DE_KN_residential2_grid_import'].diff().fillna(0)
-    data['total_production'] = data['DE_KN_residential1_pv'].diff().fillna(0)
-    data = data.ffill()
-    
     X_minutes = 60
-    data['air_conditioning_on'] = 0
-    data.loc[data['total_production'].rolling(window=X_minutes).sum().shift(-X_minutes) > data['total_consumption'].rolling(window=X_minutes).sum().shift(-X_minutes), 'air_conditioning_on'] = 1
-    
-    data['target'] = data['air_conditioning_on']
-    data.dropna(subset=['target'], inplace=True)
-    data['target'] = data['target'].astype(int)  # Convert target to integer
-    
-    return data
 
-def select_features(data):
-    logger.info("Selecting features")
-    features = [
-        'DE_KN_residential2_circulation_pump', 
-        'DE_KN_residential2_dishwasher', 
-        'DE_KN_residential2_freezer', 
-        'DE_KN_residential2_grid_import',
-        'DE_KN_residential2_washing_machine',
-        'DE_KN_residential1_pv'
-    ]
-    return data[features], data['target']
+    for key in sub_dfs.keys():
+        sub_dfs[key]['grid_import'] = sub_dfs[key]['grid_import'].diff().fillna(0)
+        sub_dfs[key]['pv'] = sub_dfs[key]['pv'].diff().fillna(0)
 
-def normalize_data(models_dir, X_train, X_valid, X_test):
+        sub_dfs[key].index = pd.to_datetime(sub_dfs[key].index, utc=True) 
+        sub_dfs[key]['hour'] = sub_dfs[key].index.hour
+        sub_dfs[key]['day_of_year'] = sub_dfs[key].index.dayofyear
+        sub_dfs[key]['day_of_week'] = sub_dfs[key].index.dayofweek
+
+        sub_dfs[key] = sub_dfs[key].dropna() 
+        sub_dfs[key]['target'] = 0
+
+        #total consumption = pv + grid_import
+        sub_dfs[key].loc[sub_dfs[key]['pv'].rolling(window=X_minutes).sum().shift(-X_minutes) > sub_dfs[key]['grid_import'].rolling(window=X_minutes).sum().shift(-X_minutes), 'target'] = 1
+        sub_dfs[key] = sub_dfs[key].dropna()
+        sub_dfs[key]['target'] = sub_dfs[key]['target'].astype(int)
+
+    return sub_dfs
+
+def select_features(sub_dfs):
+    Xs, ys = [], []
+    for key in sub_dfs.keys():
+        Xs.append(sub_dfs[key][['grid_import', 'pv', 'hour', 'day_of_year', 'day_of_week']].values)
+        ys.append(sub_dfs[key]['target'].values)
+    
+    return Xs, ys
+
+def normalize_data(models_dir, X_train_list, X_valid_list, X_test_list):
     logger.info("Normalizing data")
     scaler_path = os.path.join(models_dir, 'scaler.pkl')
     if os.path.exists(scaler_path):
@@ -151,15 +150,16 @@ def normalize_data(models_dir, X_train, X_valid, X_test):
         logger.info(f"Loading scaler from {scaler_path}")
     else:
         scaler = StandardScaler()
-        scaler.fit(X_train)
+        combined_X_train = np.concatenate(X_train_list, axis=0)
+        scaler.fit(combined_X_train)
         joblib.dump(scaler, scaler_path)
         logger.info(f"Saving scaler to {scaler_path}")
-    X_train = scaler.transform(X_train)
-    X_valid = scaler.transform(X_valid)
-    X_test = scaler.transform(X_test)
-    return X_train, X_valid, X_test
+    X_train_list = [scaler.transform(X) for X in X_train_list]
+    X_valid_list = [scaler.transform(X) for X in X_valid_list]
+    X_test_list = [scaler.transform(X) for X in X_test_list]
+    return X_train_list, X_valid_list, X_test_list
 
-def apply_pca(models_dir, X_train, X_valid, X_test):
+def apply_pca(models_dir, X_train_list, X_valid_list, X_test_list, ):
     logger.info("Applying PCA")
     pca_path = os.path.join(models_dir, 'pca.pkl')
     if os.path.exists(pca_path):
@@ -167,13 +167,14 @@ def apply_pca(models_dir, X_train, X_valid, X_test):
         logger.info(f"PCA model loaded from {pca_path}")
     else:
         pca = PCA(n_components=0.95)  # Retain 95% of variance
-        pca.fit(X_train)
+        combined_X_train = np.concatenate(X_train_list, axis=0)
+        pca.fit(combined_X_train)
         joblib.dump(pca, pca_path)
         logger.info(f"Saved PCA model to {pca_path}")
-    X_train = pca.transform(X_train)
-    X_valid = pca.transform(X_valid)
-    X_test = pca.transform(X_test)
-    return X_train, X_valid, X_test
+    X_train_list = [pca.transform(X) for X in X_train_list]
+    X_valid_list = [pca.transform(X) for X in X_valid_list]
+    X_test_list = [pca.transform(X) for X in X_test_list]
+    return X_train_list, X_valid_list, X_test_list
 
 def remove_nans(X, y):
     logger.info("Deleting rows with NaN values")
@@ -217,3 +218,23 @@ def plot_loss(history):
     plt.legend()
     plt.title('Training and Validation Loss')
     plt.show()
+
+# Divide data into train, validation, and test sets
+def split_data(Xs, ys, train_ratio=0.7, val_ratio=0.15):
+    X_train, X_valid, X_test = [], [], []
+    y_train, y_valid, y_test = [], [], []
+
+    for X, y in zip(Xs, ys):
+        n = len(X)
+        train_end = int(n * train_ratio)
+        valid_end = int(n * (train_ratio + val_ratio))
+
+        X_train.append(X[:train_end])
+        X_valid.append(X[train_end:valid_end])
+        X_test.append(X[valid_end:])
+        
+        y_train.append(y[:train_end])
+        y_valid.append(y[train_end:valid_end])
+        y_test.append(y[valid_end:])
+
+    return X_train, X_valid, X_test, y_train, y_valid, y_test
