@@ -20,6 +20,11 @@ This project aims to:
 2. Provide real-time monitoring to make decisions on whether to turn on the air conditioning based on the prediction.
 3. Serve energy consumption and production data through a Flask API.
 
+## Dataset
+
+The dataset used for this project can be found in this link: 
+https://data.open-power-system-data.org/household_data/
+
 ## Installation
 
 ### Prerequisites

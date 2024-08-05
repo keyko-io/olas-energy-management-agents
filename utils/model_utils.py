@@ -190,9 +190,9 @@ def create_tf_dataset(X, y, seq_length, batch_size, dataset_name):
         X_data.append(X[i:(i + seq_length)])
         y_data.append(y[i + seq_length])
     X_data, y_data = np.array(X_data), np.array(y_data)
-    with tf.device('/gpu:0'):
-        dataset = tf.data.Dataset.from_tensor_slices((X_data, y_data))
-        dataset = dataset.cache().shuffle(buffer_size=len(X_data)).batch(batch_size).prefetch(buffer_size=tf.data.experimental.AUTOTUNE)
+    #with tf.device('/gpu:0'):
+    dataset = tf.data.Dataset.from_tensor_slices((X_data, y_data))
+    dataset = dataset.cache().shuffle(buffer_size=len(X_data)).batch(batch_size).prefetch(buffer_size=tf.data.experimental.AUTOTUNE)
     return dataset
 
 def build_model(seq_length, input_shape, head_size, num_heads, ff_dim, num_transformer_blocks, mlp_units, dropout, mlp_dropout):
@@ -205,7 +205,7 @@ def build_model(seq_length, input_shape, head_size, num_heads, ff_dim, num_trans
     x = layers.GlobalAveragePooling1D()(x)
     for dim in mlp_units:
         x = layers.Dense(dim, activation="relu")(x)
-        x = layers.Dropout(mlp_dropout)(x)
+        #x = layers.Dropout(mlp_dropout)(x)
     outputs = layers.Dense(1, activation='sigmoid')(x)
     return Model(inputs, outputs)
 
