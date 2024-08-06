@@ -1,108 +1,44 @@
-# Energy Consumption and Production Prediction with OLAS Agents
+# Dev-template
 
-This project predicts whether the energy consumption of a household will be lower than its production in the next hour using a Transformer-based machine learning model. The project also includes a real-time monitoring script and a Flask server to provide data endpoints.
+A template for development with the open-autonomy framework. Find the documentation [here](https://docs.autonolas.network).
 
-## Table of Contents
-- [Project Overview](#project-overview)
-- [Installation](#installation)
-- [Usage](#usage)
-  - [Running the Real-Time Monitor](#running-the-real-time-monitor)
-  - [Running the Flask Server](#running-the-flask-server)
-- [API Endpoints](#api-endpoints)
-- [Project Structure](#project-structure)
-- [Contributing](#contributing)
-- [License](#license)
+## System requirements
 
-## Project Overview
+- Python `>=3.8`
+- [Tendermint](https://docs.tendermint.com/v0.34/introduction/install.html) `==0.34.19`
+- [IPFS node](https://docs.ipfs.io/install/command-line/#official-distributions) `==0.6.0`
+- [Pip](https://pip.pypa.io/en/stable/installation/)
+- [Poetry](https://python-poetry.org/)
+- [Docker Engine](https://docs.docker.com/engine/install/)
+- [Docker Compose](https://docs.docker.com/compose/install/)
 
-This project aims to:
-1. Predict whether the energy consumption of a household will be lower than its production in the next hour using a Transformer-based model.
-2. Provide real-time monitoring to make decisions on whether to turn on the air conditioning based on the prediction.
-3. Serve energy consumption and production data through a Flask API.
+Alternatively, you can fetch this docker image with the relevant requirements satisfied:
 
-## Dataset
+> **_NOTE:_**  Tendermint and IPFS dependencies are missing from the image at the moment.
 
-The dataset used for this project can be found in this link: 
-https://data.open-power-system-data.org/household_data/
-
-## Installation
-
-### Prerequisites
-
-- Python 3.10 or higher
-- pip (Python package installer)
-
-### Clone the Repository
-
-```sh
-git clone https://github.com/keyko-io/olas-energy-management-agents.git
-cd olas-energy-management-agents
+```bash
+docker pull valory/open-autonomy-user:latest
+docker container run -it valory/open-autonomy-user:latest
 ```
 
-### Install Dependencies
+## This repository contains:
 
-```sh
-pip install -r requirements.txt
+- Empty directory `packages` which acts as the local registry
+
+- .env file with Python path updated to include packages directory
+
+## How to use
+
+Create a virtual environment with all development dependencies:
+
+```bash
+poetry shell
+poetry install
 ```
 
-## Usage
-### Running the Real-Time Monitor
-The real-time monitor script fetches data from an external API, saves it to a CSV file, preprocesses the data, and makes predictions every minute.
+Get developing...
 
-```sh
-python main.py
-```
+## Useful commands:
 
-### Running the Flask Server
-The Flask server provides endpoints to fetch current and past (mock) energy data in case there is no third-party API server
-
-```sh
-python server.py
-```
-### API Endpoints
-    `/energy-data`
-    - Method: GET
-    - Description: Fetches the current energy consumption and production data.
-    - Response: JSON with the current data.
-    
-    `/past-data`
-    - Method: GET
-    - Description: Fetches the past 60 minutes of energy consumption and production data.
-    - Response: JSON array with the past 60 minutes of data.
-
-### Project Structure
-
-```
-olas-energy-management-agents/
-│
-├── main.py                  # Script for real-time monitoring and prediction
-├── server.py                # Flask server script
-├── requirements.txt         # Project dependencies
-│
-├── models/                  # Directory for saved models
-│   ├── scaler.pkl
-│   ├── pca.pkl
-│   └── transformer_model.keras
-│
-├── data/                    # Directory for storing data
-│   └── real_time_data.csv
-│
-├── utils/                   # Directory for utility modules
-│   ├── __init__.py
-│   ├── data_preprocessing.py  # Module for data preprocessing functions
-│   ├── model_utils.py         # Module for model-related functions
-│   └── transformers.py        # Module for Transformer-related classes
-│
-└── logs/                    # Directory for storing log files (optional)
-```
-
-## Contributing
-    1. Fork the repository.
-    2. Create your feature branch (git checkout -b feature/AmazingFeature).
-    3. Commit your changes (git commit -m 'Add some AmazingFeature').
-    4. Push to the branch (git push origin feature/AmazingFeature).
-    5. Open a Pull Request.
-    
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
+Check out the `Makefile` for useful commands, e.g. `make formatters`, `make generators`, `make code-checks`, as well
+as `make common-checks-1`. To run tests use the `autonomy test` command. Run `autonomy test --help` for help about its usage.

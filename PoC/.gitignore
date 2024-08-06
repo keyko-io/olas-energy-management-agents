@@ -1,0 +1,6 @@
+data
+processed_data
+.ipynb_checkpoints
+.DS_Store
+__pycache__/
+*.pyc
