@@ -1,6 +1,10 @@
 import numpy as np
+import torch
+import torch.nn as nn
+from torch.utils.data import DataLoader, TensorDataset
 import pandas as pd
 import tensorflow as tf
+from sklearn.metrics import accuracy_score
 from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import PCA
 import joblib
@@ -11,6 +15,7 @@ import coloredlogs
 import os
 import matplotlib.pyplot as plt
 from tensorflow.keras import layers, Model # type: ignore
+from tqdm import tqdm
 
 # Logging configuration
 logger = logging.getLogger(__name__)
@@ -195,6 +200,17 @@ def create_tf_dataset(X, y, seq_length, batch_size, dataset_name):
     dataset = dataset.cache().shuffle(buffer_size=len(X_data)).batch(batch_size).prefetch(buffer_size=tf.data.experimental.AUTOTUNE)
     return dataset
 
+def create_torch_datasets(X, y, seq_length, batch_size):
+    X_data, y_data = [], []
+    for i in range(len(X) - seq_length):
+        X_data.append(X[i:(i + seq_length)])
+        y_data.append(y[i + seq_length])
+    X_data, y_data = np.array(X_data), np.array(y_data)
+    X_tensor = torch.tensor(X_data, dtype=torch.float32)
+    y_tensor = torch.tensor(y_data, dtype=torch.float32)
+    dataset = TensorDataset(X_tensor, y_tensor)
+    return DataLoader(dataset, batch_size=batch_size, shuffle=True, drop_last=True)
+
 def build_model(seq_length, input_shape, head_size, num_heads, ff_dim, num_transformer_blocks, mlp_units, dropout, mlp_dropout):
     inputs = layers.Input(shape=input_shape)
     time_embedding = Time2Vector(seq_length)(inputs)
@@ -238,3 +254,77 @@ def split_data(Xs, ys, train_ratio=0.7, val_ratio=0.15):
         y_test.append(y[valid_end:])
 
     return X_train, X_valid, X_test, y_train, y_valid, y_test
+
+# Train the model
+def train_model(model, train_loader, valid_loader, criterion, optimizer, device, epochs, early_stopping_patience, models_dir):
+    model.to(device)
+    best_loss = float('inf')
+    patience_counter = 0
+    history = {'train_loss': [], 'val_loss': []}
+
+    for epoch in range(epochs):
+        model.train()
+        train_losses = []
+        progress_bar = tqdm(train_loader, desc=f'Epoch {epoch+1}/{epochs}', unit='batch')
+        for X_batch, y_batch in progress_bar:
+            X_batch, y_batch = X_batch.to(device), y_batch.to(device)
+            optimizer.zero_grad()
+            output = model(X_batch)
+            loss = criterion(output.squeeze(), y_batch)
+            loss.backward()
+            optimizer.step()
+            train_losses.append(loss.item())
+            progress_bar.set_postfix({'train_loss': loss.item()})
+            progress_bar.set_postfix({'train_accuracy': accuracy_score(y_batch.cpu().numpy(), output.squeeze().detach().cpu().numpy() > 0.5)})
+
+        val_losses = []
+        model.eval()
+        with torch.no_grad():
+            for X_batch, y_batch in valid_loader:
+                X_batch, y_batch = X_batch.to(device), y_batch.to(device)
+                output = model(X_batch)
+                loss = criterion(output.squeeze(), y_batch)
+                val_losses.append(loss.item())
+
+        train_loss = np.mean(train_losses)
+        val_loss = np.mean(val_losses)
+        history['train_loss'].append(train_loss)
+        history['val_loss'].append(val_loss)
+
+        logger.info(f'Epoch {epoch+1}/{epochs}, Train Loss: {train_loss:.4f}, Val Loss: {val_loss:.4f}')
+
+        if val_loss < best_loss:
+            best_loss = val_loss
+            torch.save(model.state_dict(), os.path.join(models_dir, 'transformer_model.pth'))
+            patience_counter = 0
+        else:
+            patience_counter += 1
+            if patience_counter >= early_stopping_patience:
+                logger.info("Early stopping")
+                break
+
+    return history
+
+# Model evaluation
+def evaluate_model(model, test_loader, device):
+    model.to(device)
+    model.eval()
+    test_losses = []
+    all_preds = []
+    all_labels = []
+    criterion = nn.BCELoss()
+
+    with torch.no_grad():
+        for X_batch, y_batch in test_loader:
+            X_batch, y_batch = X_batch.to(device), y_batch.to(device)
+            output = model(X_batch)
+            loss = criterion(output.squeeze(), y_batch)
+            test_losses.append(loss.item())
+            all_preds.append(output.squeeze().cpu().numpy())
+            all_labels.append(y_batch.cpu().numpy())
+
+    test_loss = np.mean(test_losses)
+    all_preds = np.concatenate(all_preds)
+    all_labels = np.concatenate(all_labels)
+    accuracy = accuracy_score(all_labels, all_preds > 0.5)
+    return test_loss, accuracy
