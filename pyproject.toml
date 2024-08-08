@@ -20,3 +20,4 @@ open-autonomy = "==0.14.6"
 typing_extensions = ">=3.10.0.2"
 toml = "==0.10.2"
 tomte = {version = "==0.2.15", extras = ["cli", "tests"]}
+open-aea-ledger-ethereum = "^1.55.0"
