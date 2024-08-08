@@ -1,6 +1,6 @@
 import tensorflow as tf
-from tensorflow.keras import layers
-from tensorflow.keras.saving import register_keras_serializable
+from tensorflow.keras import layers # type: ignore
+from tensorflow.keras.saving import register_keras_serializable # type: ignore
 import torch
 import torch.nn as nn
 
