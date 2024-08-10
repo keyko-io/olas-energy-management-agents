@@ -12,3 +12,4 @@ leak_report
 /Pipfile.lock
 .env
 keys.json
+ethereum_private_key.txt
