@@ -212,7 +212,9 @@ class PeaqAbciApp(AbciApp[Event]):
         RegistrationRound: {
             Event.DONE: CollectDataRound
         },
-        DeviceInteractionRound: {}
+        DeviceInteractionRound: {
+            Event.DONE: ResetAndPauseRound
+        }
     }
     final_states: Set[AppState] = set()
     event_to_timeout: EventToTimeout = {}

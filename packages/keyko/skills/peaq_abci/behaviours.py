@@ -37,6 +37,7 @@ from packages.keyko.skills.peaq_abci.rounds import (
     QueryModelRound,
     RegistrationRound,
     ResetAndPauseRound,
+    Event
 )
 from packages.keyko.skills.peaq_abci.rounds import (
     CollectDataPayload,
@@ -92,14 +93,17 @@ class DeviceInteractionBehaviour(PeaqBaseBehaviour):
 
         with self.context.benchmark_tool.measure(self.behaviour_id).local():
             sender = self.context.agent_address
-            payload = DeviceInteractionPayload(sender=sender, content=...)
+            payload = DeviceInteractionPayload(sender=sender, event=Event.DONE)
+
+            self.context.logger.info(
+                f"DeviceInteractionBehaviour: {self.context.agent_address} -> {payload}"
+            )
 
         with self.context.benchmark_tool.measure(self.behaviour_id).consensus():
             yield from self.send_a2a_transaction(payload)
             yield from self.wait_until_round_end()
 
         self.set_done()
-
 
 class QueryModelBehaviour(PeaqBaseBehaviour):
     """QueryModelBehaviour"""
@@ -112,7 +116,7 @@ class QueryModelBehaviour(PeaqBaseBehaviour):
 
         with self.context.benchmark_tool.measure(self.behaviour_id).local():
             sender = self.context.agent_address
-            payload = QueryModelPayload(sender=sender, content=...)
+            payload = QueryModelPayload(sender=sender, event=Event.DONE)
 
         with self.context.benchmark_tool.measure(self.behaviour_id).consensus():
             yield from self.send_a2a_transaction(payload)

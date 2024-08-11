@@ -7,13 +7,13 @@ license: Apache-2.0
 aea_version: '>=1.0.0, <2.0.0'
 fingerprint:
   __init__.py: bafybeibppyaanwerv6xr5dxhaidvjmxvx3frkmhtbeldaouceytn6kltpu
-  behaviours.py: bafybeie2mblrxgxnxjbhizdctlomniemcfjdz4mksiesogh5zlrwjnq6ym
+  behaviours.py: bafybeifrpkk35soo3xkcd5meoa7dquy4s6kobrrd227tp6oeyjba6r6m5i
   dialogues.py: bafybeicko5ws4fdwndjoog5a6hzbmozcc3wmeb3yeqpmamv4d6nuqc5beu
-  fsm_specification.yaml: bafybeicdpthmi4y5kjrvzq2wjg5suians7pyd7hzrmzspgs6ls4ri6iq4m
+  fsm_specification.yaml: bafybeien4drizfvq6ntg2bagfdbyagr3naxd66syyv3f7ab7xlmy2zww54
   handlers.py: bafybeih6l3xjs2zro2tq4add6xsszwf3efket6sohsuzjygiqblqbga7om
   models.py: bafybeig5midf4hsimdeb4jtrwskad2qnhhmadiruzdpdiryxraxmwdhazm
   payloads.py: bafybeibpeoryxeuympuz6axzfwiepo76av5g6sbwooycskgzq5r2r5opxu
-  rounds.py: bafybeiedkmtnhhvwqjmzc5wnz76dto5raalsgv4vdgv35xditr4bwzweoq
+  rounds.py: bafybeidlxteh4hwdh75sqlcx6hfu4vlr376csiq4vcu5ixq65o7mfhcrka
   tests/__init__.py: bafybeifigp64li3j3yidpan5arc27etm3jytadjsckjaidrem57hst73ry
   tests/test_behaviours.py: bafybeicwb3citz6xjalkykiguplosnv427x7pirkxhcpzekfvxl3jk2s6q
   tests/test_dialogues.py: bafybeihrg3vsvnditsus75hq2inaara4zsekdfrtnltwrg6ktbo7jdvvju
@@ -112,6 +112,12 @@ models:
       round_timeout_seconds: 30.0
       service_id: peaq
       service_registry_address: null
+      slash_cooldown_hours: 3
+      slash_threshold_amount: 10000000000000000
+      light_slash_unit_amount: 5000000000000000
+      serious_slash_unit_amount: 8000000000000000
+      use_termination: false
+      use_slashing: false
       setup:
         all_participants:
         - '0x0000000000000000000000000000000000000000'

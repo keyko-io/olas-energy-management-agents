@@ -21,7 +21,7 @@ protocols:
 skills:
 - valory/abstract_abci:0.1.0:bafybeihljirk3d4rgvmx2nmz3p2mp27iwh2o5euce5gccwjwrpawyjzuaq
 - valory/abstract_round_abci:0.1.0:bafybeigjrepaqpb3m7zunmt4hryos4vto4yyj3u6iyofdb2fotwho3bqvm
-- keyko/peaq_abci:0.1.0:bafybeiab37o63xt2rdmj6fqwezusppbhrbrz6vtwdvgpof35sidc5tsbsu
+- keyko/peaq_abci:0.1.0:bafybeidio7hafq2ltak7jxl3lint4p5yiiyekoq5ajimfemuol4wpoqupe
 default_ledger: ethereum
 required_ledgers:
 - ethereum
@@ -74,6 +74,12 @@ models:
         consensus_threshold: ${int:null}
       tendermint_url: ${str:http://localhost:26657}
       tendermint_com_url: ${str:http://localhost:8080}
+      slash_cooldown_hours: ${int:3}
+      slash_threshold_amount: ${int:10000000000000000}
+      light_slash_unit_amount: ${int:5000000000000000}
+      serious_slash_unit_amount: ${int:8000000000000000}
+      use_termination: ${bool:false}
+      use_slashing: ${bool:false}
       reset_pause_duration: ${int:10}
 ---
 public_id: valory/abci:0.1.0
