@@ -25,4 +25,4 @@ transition_func:
     (ResetAndPauseRound, DONE): CollectDataRound
     (ResetAndPauseRound, RESET_TIMEOUT): RegistrationRound
     (RegistrationRound, DONE): CollectDataRound
-    (DeviceInteractionRound, DONE): ResetAndPauseRound
+    (DeviceInteractionRound, DONE): CollectDataRound

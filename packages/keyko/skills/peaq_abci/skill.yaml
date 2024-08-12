@@ -7,13 +7,13 @@ license: Apache-2.0
 aea_version: '>=1.0.0, <2.0.0'
 fingerprint:
   __init__.py: bafybeibppyaanwerv6xr5dxhaidvjmxvx3frkmhtbeldaouceytn6kltpu
-  behaviours.py: bafybeifrpkk35soo3xkcd5meoa7dquy4s6kobrrd227tp6oeyjba6r6m5i
+  behaviours.py: bafybeickq52etba2m6va77iwe2e65em4mkoasrsezv27dld7z4bqymxjx4
   dialogues.py: bafybeicko5ws4fdwndjoog5a6hzbmozcc3wmeb3yeqpmamv4d6nuqc5beu
-  fsm_specification.yaml: bafybeien4drizfvq6ntg2bagfdbyagr3naxd66syyv3f7ab7xlmy2zww54
+  fsm_specification.yaml: bafybeialvno5uanwhokywdmo7j5k3fijfpbuikdsbibbbub2axy44x7sjq
   handlers.py: bafybeih6l3xjs2zro2tq4add6xsszwf3efket6sohsuzjygiqblqbga7om
-  models.py: bafybeig5midf4hsimdeb4jtrwskad2qnhhmadiruzdpdiryxraxmwdhazm
-  payloads.py: bafybeibpeoryxeuympuz6axzfwiepo76av5g6sbwooycskgzq5r2r5opxu
-  rounds.py: bafybeidlxteh4hwdh75sqlcx6hfu4vlr376csiq4vcu5ixq65o7mfhcrka
+  models.py: bafybeihbmirvijezpddxoybvl6dkbb2ltjvdjalhhg5bui6eo4ywz4kjwy
+  payloads.py: bafybeigxpoqinz7ucblw4r6qqlgdesnmvq3xidstjrznr7c5mqp6twtshi
+  rounds.py: bafybeieovap44io5jm7a2j6dsffbinqbj7mxs342sybr3zdsxsisy3x4ji
   tests/__init__.py: bafybeifigp64li3j3yidpan5arc27etm3jytadjsckjaidrem57hst73ry
   tests/test_behaviours.py: bafybeicwb3citz6xjalkykiguplosnv427x7pirkxhcpzekfvxl3jk2s6q
   tests/test_dialogues.py: bafybeihrg3vsvnditsus75hq2inaara4zsekdfrtnltwrg6ktbo7jdvvju
@@ -106,10 +106,12 @@ models:
       request_retry_delay: 1.0
       request_timeout: 10.0
       reset_pause_duration: 10
-      reset_tendermint_after: 2
+      reset_tendermint_after: 4
+      combinder_api_url: http://localhost:8080
       retry_attempts: 400
       retry_timeout: 3
       round_timeout_seconds: 30.0
+      number_of_data_points: 60
       service_id: peaq
       service_registry_address: null
       slash_cooldown_hours: 3
@@ -124,8 +126,8 @@ models:
         consensus_threshold: null
         safe_contract_address: '0x0000000000000000000000000000000000000000'
       share_tm_config_on_startup: false
-      sleep_time: 1
-      tendermint_check_sleep_delay: 3
+      sleep_time: 7
+      tendermint_check_sleep_delay: 6
       tendermint_com_url: http://localhost:8080
       tendermint_max_retries: 5
       tendermint_p2p_url: localhost:26656

@@ -21,7 +21,7 @@ protocols:
 skills:
 - valory/abstract_abci:0.1.0:bafybeihljirk3d4rgvmx2nmz3p2mp27iwh2o5euce5gccwjwrpawyjzuaq
 - valory/abstract_round_abci:0.1.0:bafybeigjrepaqpb3m7zunmt4hryos4vto4yyj3u6iyofdb2fotwho3bqvm
-- keyko/peaq_abci:0.1.0:bafybeidio7hafq2ltak7jxl3lint4p5yiiyekoq5ajimfemuol4wpoqupe
+- keyko/peaq_abci:0.1.0:bafybeiceawpgynnkkn4pcmdrkjij63mzbm5n7zxjvzrgkom5uzwvesrs4q
 default_ledger: ethereum
 required_ledgers:
 - ethereum
@@ -69,7 +69,7 @@ models:
       share_tm_config_on_startup: ${bool:false}
       on_chain_service_id: ${int:null}
       setup:
-        all_participants: ${list:[]}
+        all_participants: ${list:["0xf558A1fE24B5aA052D10CdC47Da684e6Cd63B975"]}
         safe_contract_address: ${str:'0x0000000000000000000000000000000000000000'}
         consensus_threshold: ${int:null}
       tendermint_url: ${str:http://localhost:26657}
@@ -81,11 +81,12 @@ models:
       use_termination: ${bool:false}
       use_slashing: ${bool:false}
       reset_pause_duration: ${int:10}
+      number_of_data_points: ${int:60}
 ---
 public_id: valory/abci:0.1.0
 type: connection
 config:
-  target_skill_id: valory/hello_world_abci:0.1.0
+  target_skill_id: keyko/peaq_abci:0.1.0
   host: ${str:localhost}
   port: ${int:26658}
   use_tendermint: ${bool:false}

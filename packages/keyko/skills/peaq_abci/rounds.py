@@ -20,7 +20,8 @@
 """This package contains the rounds of PeaqAbciApp."""
 
 from enum import Enum
-from typing import Dict, FrozenSet, List, Optional, Set, Tuple
+from typing import Dict, FrozenSet, List, Optional, Set, Tuple, cast
+import json
 
 from packages.valory.skills.abstract_round_abci.base import (
     AbciApp,
@@ -30,6 +31,10 @@ from packages.valory.skills.abstract_round_abci.base import (
     BaseSynchronizedData,
     DegenerateRound,
     EventToTimeout,
+    get_name,
+    CollectDifferentUntilAllRound,
+    CollectSameUntilAllRound,
+    CollectSameUntilThresholdRound
 )
 
 from packages.keyko.skills.peaq_abci.payloads import (
@@ -40,7 +45,6 @@ from packages.keyko.skills.peaq_abci.payloads import (
     ResetAndPausePayload,
 )
 
-
 class Event(Enum):
     """PeaqAbciApp Events"""
 
@@ -48,6 +52,7 @@ class Event(Enum):
     ROUND_TIMEOUT = "round_timeout"
     NO_TRANSACT = "no_transact"
     DONE = "done"
+    ERROR = "error"
     RESET_TIMEOUT = "reset_timeout"
     NOT_ENOUGH_DATA = "not_enough_data"
 
@@ -58,32 +63,82 @@ class SynchronizedData(BaseSynchronizedData):
 
     This data is replicated by the tendermint application.
     """
+    @property
+    def prosumer_data(self) -> int:
+        """Get the print count."""
+        return self.db.get("prosumer_data", [])
 
 
-class CollectDataRound(AbstractRound):
+
+class RegistrationRound(CollectSameUntilThresholdRound):
+    """RegistrationRound"""
+
+    payload_class = RegistrationPayload
+    payload_attribute = ""  # TODO: update
+    synchronized_data_class = SynchronizedData
+    payload_sent = False
+
+    def end_block(self) -> Optional[Tuple[BaseSynchronizedData, Enum]]:
+        """Process the end of the block."""
+
+        if not self.payload_sent:
+            return None
+        
+        print(len(self.synchronized_data.prosumer_data))
+
+        if len(self.synchronized_data.prosumer_data) >= 59:
+            return self.synchronized_data, Event.DONE
+        return None
+
+    def check_payload(self, payload: CollectDataPayload) -> None:
+        """Check payload."""
+        return
+
+    def process_payload(self, payload: CollectDataPayload) -> None:
+        """Process payload."""
+        self.synchronized_data.update(
+            participants=tuple(sorted(self.collection)),
+            prosumer_data=payload.prosumer_data[-59:],
+            synchronized_data_class=SynchronizedData,
+        )
+        self.payload_sent = True
+        return
+
+class CollectDataRound(CollectSameUntilThresholdRound):
     """CollectDataRound"""
 
     payload_class = CollectDataPayload
     payload_attribute = ""  # TODO: update
     synchronized_data_class = SynchronizedData
-
-    # TODO: replace AbstractRound with one of CollectDifferentUntilAllRound,
-    # CollectSameUntilAllRound, CollectSameUntilThresholdRound,
-    # CollectDifferentUntilThresholdRound, OnlyKeeperSendsRound, VotingRound,
-    # from packages/valory/skills/abstract_round_abci/base.py
-    # or implement the methods
+    payload_sent = False
 
     def end_block(self) -> Optional[Tuple[BaseSynchronizedData, Enum]]:
         """Process the end of the block."""
-        raise NotImplementedError
+        if not self.payload_sent:
+            return None
+        
+        self.payload_sent = False
+        
+        if len(self.synchronized_data.prosumer_data) >= 60:
+            return self.synchronized_data, Event.DONE
+    
+        return self.synchronized_data, Event.NOT_ENOUGH_DATA
 
     def check_payload(self, payload: CollectDataPayload) -> None:
         """Check payload."""
-        raise NotImplementedError
+        return
 
     def process_payload(self, payload: CollectDataPayload) -> None:
         """Process payload."""
-        raise NotImplementedError
+        prosumer_data = self.synchronized_data.prosumer_data
+        print(payload)
+        prosumer_data.append(payload.prosumer_data)
+        self.synchronized_data.update(
+            prosumer_data=prosumer_data[-60:],
+            synchronized_data_class=SynchronizedData,
+        )
+        self.payload_sent = True
+        return
 
 
 class DeviceInteractionRound(AbstractRound):
@@ -105,11 +160,11 @@ class DeviceInteractionRound(AbstractRound):
 
     def check_payload(self, payload: DeviceInteractionPayload) -> None:
         """Check payload."""
-        raise NotImplementedError
+        return
 
     def process_payload(self, payload: DeviceInteractionPayload) -> None:
         """Process payload."""
-        raise NotImplementedError
+        return
 
 
 class QueryModelRound(AbstractRound):
@@ -131,64 +186,29 @@ class QueryModelRound(AbstractRound):
 
     def check_payload(self, payload: QueryModelPayload) -> None:
         """Check payload."""
-        raise NotImplementedError
+        return
 
     def process_payload(self, payload: QueryModelPayload) -> None:
         """Process payload."""
-        raise NotImplementedError
+        return
 
 
-class RegistrationRound(AbstractRound):
-    """RegistrationRound"""
-
-    payload_class = RegistrationPayload
-    payload_attribute = ""  # TODO: update
-    synchronized_data_class = SynchronizedData
-
-    # TODO: replace AbstractRound with one of CollectDifferentUntilAllRound,
-    # CollectSameUntilAllRound, CollectSameUntilThresholdRound,
-    # CollectDifferentUntilThresholdRound, OnlyKeeperSendsRound, VotingRound,
-    # from packages/valory/skills/abstract_round_abci/base.py
-    # or implement the methods
-
-    def end_block(self) -> Optional[Tuple[BaseSynchronizedData, Enum]]:
-        """Process the end of the block."""
-        raise NotImplementedError
-
-    def check_payload(self, payload: RegistrationPayload) -> None:
-        """Check payload."""
-        raise NotImplementedError
-
-    def process_payload(self, payload: RegistrationPayload) -> None:
-        """Process payload."""
-        raise NotImplementedError
-
-
-class ResetAndPauseRound(AbstractRound):
+class ResetAndPauseRound(CollectSameUntilThresholdRound):
     """ResetAndPauseRound"""
 
     payload_class = ResetAndPausePayload
     payload_attribute = ""  # TODO: update
     synchronized_data_class = SynchronizedData
 
-    # TODO: replace AbstractRound with one of CollectDifferentUntilAllRound,
-    # CollectSameUntilAllRound, CollectSameUntilThresholdRound,
-    # CollectDifferentUntilThresholdRound, OnlyKeeperSendsRound, VotingRound,
-    # from packages/valory/skills/abstract_round_abci/base.py
-    # or implement the methods
-
     def end_block(self) -> Optional[Tuple[BaseSynchronizedData, Enum]]:
         """Process the end of the block."""
-        raise NotImplementedError
-
-    def check_payload(self, payload: ResetAndPausePayload) -> None:
-        """Check payload."""
-        raise NotImplementedError
-
-    def process_payload(self, payload: ResetAndPausePayload) -> None:
-        """Process payload."""
-        raise NotImplementedError
-
+        if self.threshold_reached:
+            return self.synchronized_data.create(), Event.DONE
+        if not self.is_majority_possible(
+            self.collection, self.synchronized_data.nb_participants
+        ):
+            return self.synchronized_data, Event.NO_MAJORITY
+        return None
 
 class PeaqAbciApp(AbciApp[Event]):
     """PeaqAbciApp"""
@@ -203,7 +223,8 @@ class PeaqAbciApp(AbciApp[Event]):
         },
         QueryModelRound: {
             Event.NO_TRANSACT: ResetAndPauseRound,
-            Event.TRANSACT: DeviceInteractionRound
+            Event.TRANSACT: DeviceInteractionRound,
+            Event.ERROR: ResetAndPauseRound
         },
         ResetAndPauseRound: {
             Event.DONE: CollectDataRound,
@@ -218,7 +239,9 @@ class PeaqAbciApp(AbciApp[Event]):
     }
     final_states: Set[AppState] = set()
     event_to_timeout: EventToTimeout = {}
-    cross_period_persisted_keys: FrozenSet[str] = frozenset()
+    cross_period_persisted_keys: frozenset[str] = frozenset(
+        [get_name(SynchronizedData.prosumer_data)]
+    )
     db_pre_conditions: Dict[AppState, Set[str]] = {
         RegistrationRound: [],
     }

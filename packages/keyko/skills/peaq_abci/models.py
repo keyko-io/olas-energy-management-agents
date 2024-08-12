@@ -19,6 +19,8 @@
 
 """This module contains the shared state for the abci skill of PeaqAbciApp."""
 
+from typing import Any
+
 from packages.valory.skills.abstract_round_abci.models import BaseParams
 from packages.valory.skills.abstract_round_abci.models import (
     BenchmarkTool as BaseBenchmarkTool,
@@ -36,6 +38,16 @@ class SharedState(BaseSharedState):
     abci_app_cls = PeaqAbciApp
 
 
-Params = BaseParams
 Requests = BaseRequests
 BenchmarkTool = BaseBenchmarkTool
+
+class Params(BaseParams):
+    """Parameters."""
+
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        """Initialize the parameters object."""
+        self.number_of_data_points = kwargs.get("number_of_data_points", None)
+        self.combinder_api_url = kwargs.get("combinder_api_url", None)
+
+        super().__init__(*args, **kwargs)
+

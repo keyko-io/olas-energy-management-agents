@@ -1,11 +1,71 @@
-from flask import Flask, jsonify
+import sys
+sys.path.append('..')
+
+from flask import Flask, jsonify, request
 import pandas as pd
+import torch
 import os
+import numpy as np
+import joblib
 from datetime import datetime, timedelta
 from dateutil import tz
+from utils.transformers import TransformerModel
 
 app = Flask(__name__)
-DATA_FILE = 'data/mock_data.csv'
+DATA_FILE = '../data/residential4_features.csv'
+MODEL_FILE = '../models/transformer_model.pth'
+SCALER_FILE = '../models/scaler.pkl'
+
+model = TransformerModel(
+    seq_length=60,
+    input_dim=5,  # 2 features (pv, grid_import) + 3 (hour, day_of_year, day_of_week)
+    head_size=256,
+    num_heads=4,
+    ff_dim=4,
+    num_transformer_blocks=4,
+    mlp_units=[128],
+    dropout=0.1,
+    mlp_dropout=0.1
+)
+model.load_state_dict(torch.load(MODEL_FILE))
+model.eval()  # Set model to evaluation mode
+
+scaler = joblib.load(SCALER_FILE)
+
+
+def preprocess_data_from_api(data_list):
+    """
+    Preprocesses the list of data received from the API to be suitable for the model.
+
+    :param data_list: List of dictionaries containing pv, grid_import, and cet_cest_timestamp.
+    :return: A torch tensor ready for the model.
+    """
+    # Extract values from the list of dictionaries
+    pv_values = []
+    grid_import_values = []
+    hours = []
+    day_of_years = []
+    day_of_weeks = []
+
+    for data in data_list:
+        print(data)
+        pv_values.append(data['pv'])
+        grid_import_values.append(data['grid_import'])
+        timestamp = datetime.strptime(data['cet_cest_timestamp'], '%Y-%m-%d %H:%M:%S')
+        hours.append(timestamp.hour)
+        day_of_years.append(timestamp.timetuple().tm_yday)
+        day_of_weeks.append(timestamp.weekday())
+
+    # Convert to numpy array
+    features = np.array([grid_import_values, pv_values, hours, day_of_years, day_of_weeks]).T
+
+    # Normalize the features
+    features_normalized = scaler.transform(features)
+
+    # Convert to torch tensor
+    features_tensor = torch.tensor(features_normalized, dtype=torch.float32).unsqueeze(0)  # Add batch dimension
+
+    return features_tensor
 
 def load_real_time_data(file_path: str) -> pd.DataFrame:
     """
@@ -19,6 +79,45 @@ def load_real_time_data(file_path: str) -> pd.DataFrame:
     
     return pd.read_csv(file_path, parse_dates=['cet_cest_timestamp'], index_col='cet_cest_timestamp', low_memory=False)
 
+def make_prediction(model, processed_data):
+    """
+    Makes a prediction using the model with the processed data.
+
+    :param model: The loaded Transformer model.
+    :param processed_data: Preprocessed data as a torch tensor.
+    :return: Prediction result.
+    """
+    with torch.no_grad():
+        prediction = model(processed_data)
+        return prediction.squeeze().item()
+
+@app.route('/predict', methods=['POST'])
+def predict_energy():
+    """
+    Endpoint to receive the last 60 minutes of pv, grid_import, and timestamp data and return a prediction.
+
+    :return: JSON response with the prediction result.
+    """
+    try:
+        data = request.json
+
+        # Verify that the data has exactly 60 data points
+        if len(data) != 60:
+            return jsonify({"error": "Exactly 60 data points are required."}), 400
+
+        # Preprocess the data
+        processed_data = preprocess_data_from_api(data)
+
+        # Make prediction
+        prediction = make_prediction(model, processed_data)
+
+
+        result = "The consumption will be lower than production in the next hour." if prediction > 0.5 else "The consumption will not be lower than production in the next hour."
+
+        return jsonify({"prediction": result, "prediction_class": 1 if prediction > 0.5 else 0})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    
 @app.route('/energy-data', methods=['GET'])
 def get_energy_data():
     """
@@ -58,14 +157,21 @@ def get_past_data():
         # Get current date and time in UTC
         now = datetime.now().astimezone(tz=tz.gettz('UTC+2'))
 
-        # Calculate the start time (60 minutes ago)
+        # Round down to the nearest minute (i.e., second 00)
+        now = now.replace(second=0, microsecond=0)
+
+        # Calculate the start time (60 minutes ago) and round to the nearest minute
         start_time = now - timedelta(minutes=60)
-        
+        start_time = start_time.replace(second=0, microsecond=0)
+
         # Filter data for the last 60 minutes
         past_data = data.loc[start_time:now]
         
         # Reset index to include the timestamp in the JSON output
         past_data.reset_index(inplace=True)
+
+        # Transform "Mon, 12 Aug 2024 14:44:00 GMT" to "2024-08-12 14:44:00"
+        past_data['cet_cest_timestamp'] = past_data['cet_cest_timestamp'].dt.strftime('%Y-%m-%d %H:%M:00')
         
         # Convert the data to JSON
         response = past_data.to_dict(orient='records')
