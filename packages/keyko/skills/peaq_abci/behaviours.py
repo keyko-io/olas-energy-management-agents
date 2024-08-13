@@ -75,6 +75,7 @@ class RegistrationBehaviour(PeaqBaseBehaviour):
 
         with self.context.benchmark_tool.measure(self.behaviour_id).local():
             energy_data = yield from self.get_combinder_past_data()
+            self.context.logger.info(f"RegistrationBehaviour: For testing purposes, we'll prefill the prosumer data with last 60 minutes from CSV")
             sender = self.context.agent_address
             payload = RegistrationPayload(sender=sender, prosumer_data=energy_data)
 
@@ -117,7 +118,8 @@ class CollectDataBehaviour(PeaqBaseBehaviour):
 
         with self.context.benchmark_tool.measure(self.behaviour_id).local():
             energy_data = yield from self.get_combinder_data()
-            
+            self.context.logger.info(f"CollectDataBehaviour: Fetching data from Combinder API: {energy_data}")
+
             sender = self.context.agent_address
             payload = CollectDataPayload(sender=sender, prosumer_data=energy_data)
 
@@ -165,6 +167,8 @@ class QueryModelBehaviour(PeaqBaseBehaviour):
 
         with self.context.benchmark_tool.measure(self.behaviour_id).local():
             model_prediction = yield from self.query_model()
+            self.context.logger.info(f"QueryModelBehaviour: Model prediction: {model_prediction}")
+
             sender = self.context.agent_address
             payload = QueryModelPayload(sender=sender, prediction_class=model_prediction)
 
@@ -212,6 +216,8 @@ class DeviceInteractionBehaviour(PeaqBaseBehaviour):
         with self.context.benchmark_tool.measure(self.behaviour_id).local():
             device_action = bool(self.synchronized_data.last_prediction_class)
             ret = yield from self.control_device(self.params.device_id, device_action)
+            self.context.logger.info(f"DeviceInteractionBehaviour: Device control response: {ret}")
+
             sender = self.context.agent_address
             payload = DeviceInteractionPayload(sender=sender, success=ret["success"], message=ret["message"])
 
@@ -259,7 +265,9 @@ class ResetAndPauseBehaviour(PeaqBaseBehaviour):
         """Do the act, supporting asynchronous execution."""
 
         with self.context.benchmark_tool.measure(self.behaviour_id).local():
+            self.context.logger.info(f"ResetAndPauseBehaviour: Reset and pause for {self.params.reset_pause_duration} seconds")
             yield from self.sleep(self.params.reset_pause_duration)
+
             sender = self.context.agent_address
             payload = ResetAndPausePayload(sender=sender)
 

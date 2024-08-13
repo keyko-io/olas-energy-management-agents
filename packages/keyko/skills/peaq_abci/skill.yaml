@@ -7,7 +7,7 @@ license: Apache-2.0
 aea_version: '>=1.0.0, <2.0.0'
 fingerprint:
   __init__.py: bafybeibppyaanwerv6xr5dxhaidvjmxvx3frkmhtbeldaouceytn6kltpu
-  behaviours.py: bafybeidsayb2chr4uvz4di25spb72wtg2idaslzz4eszxwziabufellws4
+  behaviours.py: bafybeidb6gmkbawngqygivzkgczzl3rcnkyulpt6gdriclfuygv5zm4hdq
   dialogues.py: bafybeicko5ws4fdwndjoog5a6hzbmozcc3wmeb3yeqpmamv4d6nuqc5beu
   fsm_specification.yaml: bafybeieo3m4r3tbgtg5cfvjvnmb33ragkqlqkzstrx3mnvmmidj5egdzpe
   handlers.py: bafybeih6l3xjs2zro2tq4add6xsszwf3efket6sohsuzjygiqblqbga7om
@@ -105,7 +105,6 @@ models:
       on_chain_service_id: null
       request_retry_delay: 1.0
       request_timeout: 10.0
-      reset_pause_duration: 10
       reset_tendermint_after: 4
       combinder_api_url: http://localhost:8080
       model_api_url: http://localhost:8080
@@ -113,6 +112,7 @@ models:
       retry_attempts: 400
       retry_timeout: 3
       round_timeout_seconds: 30.0
+      reset_pause_duration: 60
       number_of_data_points: 60
       service_id: peaq
       service_registry_address: null
