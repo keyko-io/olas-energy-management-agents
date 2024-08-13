@@ -14,3 +14,4 @@ leak_report
 keys.json
 ethereum_private_key.txt
 peaq_agent
+.vscode
