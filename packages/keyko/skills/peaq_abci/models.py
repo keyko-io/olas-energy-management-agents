@@ -48,6 +48,8 @@ class Params(BaseParams):
         """Initialize the parameters object."""
         self.number_of_data_points = kwargs.get("number_of_data_points", None)
         self.combinder_api_url = kwargs.get("combinder_api_url", None)
+        self.model_api_url = kwargs.get("model_api_url", None)
+        self.device_id = kwargs.get("device_id", None)
 
         super().__init__(*args, **kwargs)
 

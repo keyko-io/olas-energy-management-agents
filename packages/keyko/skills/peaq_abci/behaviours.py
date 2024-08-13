@@ -103,7 +103,6 @@ class RegistrationBehaviour(PeaqBaseBehaviour):
             self.context.logger.error(f"APICheckBehaviour: Response headers: {response.headers}")
             return ""
         
-        self.context.logger.info(f"APICheckBehaviour: {response.body}")
         data = json.loads(response.body)
         
         return data
@@ -117,22 +116,7 @@ class CollectDataBehaviour(PeaqBaseBehaviour):
         """Do the act, supporting asynchronous execution."""
 
         with self.context.benchmark_tool.measure(self.behaviour_id).local():
-            # Step 1: Retrieve power consumption data from the server
-            self.context.logger.info(
-                f"CollectDataBehaviour: Starting the API check."
-            )
             energy_data = yield from self.get_combinder_data()
-            self.context.logger.info(
-                f"CollectDataBehaviour: Energy data: {energy_data}"
-            )
-
-            self.context.logger.info(
-                f"SynchronizedData: {self.synchronized_data.prosumer_data}"
-            )
-
-            self.context.logger.info(
-                f"CollectDataBehaviour: {self.context.agent_address} -> {energy_data}"
-            )
             
             sender = self.context.agent_address
             payload = CollectDataPayload(sender=sender, prosumer_data=energy_data)
@@ -162,7 +146,6 @@ class CollectDataBehaviour(PeaqBaseBehaviour):
             self.context.logger.error(f"APICheckBehaviour: Response headers: {response.headers}")
             return ""
         
-        self.context.logger.info(f"APICheckBehaviour: {response.body}")
         data = json.loads(response.body)
         
         return {
@@ -182,9 +165,6 @@ class QueryModelBehaviour(PeaqBaseBehaviour):
 
         with self.context.benchmark_tool.measure(self.behaviour_id).local():
             model_prediction = yield from self.query_model()
-            self.context.logger.info(
-                f"QueryModelBehaviour: {self.context.agent_address} -> {model_prediction}"
-            )
             sender = self.context.agent_address
             payload = QueryModelPayload(sender=sender, prediction_class=model_prediction)
 
@@ -196,12 +176,14 @@ class QueryModelBehaviour(PeaqBaseBehaviour):
 
     def query_model(self):
         # Query the model with synchronized data
-        url = self.params.combinder_api_url + f"/predict"
-        print(json.dumps(self.synchronized_data.prosumer_data))
+        url = self.params.model_api_url + f"/predict"
+        http_params = {
+            "data": self.synchronized_data.prosumer_data
+        }
         response = yield from self.get_http_response(
             method="POST",
             url=url,
-            content=json.dumps(self.synchronized_data.prosumer_data),
+            content=json.dumps(http_params).encode('utf-8'),
             headers={"Content-Type": "application/json"}
         )
 
@@ -216,7 +198,7 @@ class QueryModelBehaviour(PeaqBaseBehaviour):
             return -1
 
         data = json.loads(response.body)
-        self.context.logger.info(f"QueryModelBehaviour: {data}")
+
         return data["prediction_class"]
 
 class DeviceInteractionBehaviour(PeaqBaseBehaviour):
@@ -224,23 +206,48 @@ class DeviceInteractionBehaviour(PeaqBaseBehaviour):
 
     matching_round: Type[AbstractRound] = DeviceInteractionRound
 
-    # TODO: implement logic required to set payload content for synchronization
     def async_act(self) -> Generator:
         """Do the act, supporting asynchronous execution."""
 
         with self.context.benchmark_tool.measure(self.behaviour_id).local():
+            device_action = bool(self.synchronized_data.last_prediction_class)
+            ret = yield from self.control_device(self.params.device_id, device_action)
             sender = self.context.agent_address
-            payload = DeviceInteractionPayload(sender=sender, event=Event.DONE)
-
-            self.context.logger.info(
-                f"DeviceInteractionBehaviour: {self.context.agent_address} -> {payload}"
-            )
+            payload = DeviceInteractionPayload(sender=sender, success=ret["success"], message=ret["message"])
 
         with self.context.benchmark_tool.measure(self.behaviour_id).consensus():
             yield from self.send_a2a_transaction(payload)
             yield from self.wait_until_round_end()
 
         self.set_done()
+        
+    def control_device(self, device_id, device_action):
+        # Control the device based on the prediction
+        url = self.params.combinder_api_url + f"/device/control"
+        response = yield from self.get_http_response(
+            method="POST",
+            url=url,
+            content=json.dumps({
+                "device_id": device_id,
+                "action": int(device_action)
+            }).encode('utf-8'),
+            headers={"Content-Type": "application/json"}
+        )
+        if response.status_code != 200:
+            self.context.logger.error(
+                f"DeviceInteractionBehaviour: url: {url}\n"
+                f"DeviceInteractionBehaviour: Could not control device from Combinder API.\n"
+                f"DeviceInteractionBehaviour: Received status code {response.status_code}.\n"
+            )
+            self.context.logger.error(f"DeviceInteractionBehaviour: Response body: {response.body}")
+            self.context.logger.error(f"DeviceInteractionBehaviour: Response headers: {response.headers}")
+            return {
+                "success": False,
+                "message": f"Could not control device. (Status code: {response.status_code})"
+            }
+        data = json.loads(response.body)
+
+        return data
 
 
 class ResetAndPauseBehaviour(PeaqBaseBehaviour):
@@ -252,13 +259,7 @@ class ResetAndPauseBehaviour(PeaqBaseBehaviour):
         """Do the act, supporting asynchronous execution."""
 
         with self.context.benchmark_tool.measure(self.behaviour_id).local():
-            self.context.logger.info(
-                f"ResetAndPauseBehaviourA: {self.context.agent_address} -> {self.params.reset_pause_duration}"
-            )
             yield from self.sleep(self.params.reset_pause_duration)
-            self.context.logger.info(
-                f"ResetAndPauseBehaviour: {self.context.agent_address} -> {self.params.reset_pause_duration}"
-            )
             sender = self.context.agent_address
             payload = ResetAndPausePayload(sender=sender)
 

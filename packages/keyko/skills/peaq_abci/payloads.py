@@ -27,7 +27,6 @@ from packages.valory.skills.abstract_round_abci.base import BaseTxPayload
 @dataclass(frozen=True)
 class RegistrationPayload(BaseTxPayload):
     """Represent a transaction payload for the RegistrationRound."""
-
     prosumer_data: list
 
 @dataclass(frozen=True)
@@ -38,18 +37,15 @@ class CollectDataPayload(BaseTxPayload):
 @dataclass(frozen=True)
 class DeviceInteractionPayload(BaseTxPayload):
     """Represent a transaction payload for the DeviceInteractionRound."""
-
-    # TODO: define your attributes
+    success: bool
+    message: str
 
 @dataclass(frozen=True)
 class QueryModelPayload(BaseTxPayload):
     """Represent a transaction payload for the QueryModelRound."""
-
     prediction_class: int
 
 @dataclass(frozen=True)
 class ResetAndPausePayload(BaseTxPayload):
     """Represent a transaction payload for the ResetAndPauseRound."""
-
-    # TODO: define your attributes
 

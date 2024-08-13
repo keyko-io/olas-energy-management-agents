@@ -7,13 +7,13 @@ license: Apache-2.0
 aea_version: '>=1.0.0, <2.0.0'
 fingerprint:
   __init__.py: bafybeibppyaanwerv6xr5dxhaidvjmxvx3frkmhtbeldaouceytn6kltpu
-  behaviours.py: bafybeickq52etba2m6va77iwe2e65em4mkoasrsezv27dld7z4bqymxjx4
+  behaviours.py: bafybeidsayb2chr4uvz4di25spb72wtg2idaslzz4eszxwziabufellws4
   dialogues.py: bafybeicko5ws4fdwndjoog5a6hzbmozcc3wmeb3yeqpmamv4d6nuqc5beu
-  fsm_specification.yaml: bafybeialvno5uanwhokywdmo7j5k3fijfpbuikdsbibbbub2axy44x7sjq
+  fsm_specification.yaml: bafybeieo3m4r3tbgtg5cfvjvnmb33ragkqlqkzstrx3mnvmmidj5egdzpe
   handlers.py: bafybeih6l3xjs2zro2tq4add6xsszwf3efket6sohsuzjygiqblqbga7om
-  models.py: bafybeihbmirvijezpddxoybvl6dkbb2ltjvdjalhhg5bui6eo4ywz4kjwy
-  payloads.py: bafybeigxpoqinz7ucblw4r6qqlgdesnmvq3xidstjrznr7c5mqp6twtshi
-  rounds.py: bafybeieovap44io5jm7a2j6dsffbinqbj7mxs342sybr3zdsxsisy3x4ji
+  models.py: bafybeibptvhd4nvebx3php4a53d2kkvlrpto2cmb4yrtfohsaey343ed2y
+  payloads.py: bafybeidpobadayicx3fzn6tnpsl5qoxk65s4pwcnajvl7dzt7z3nxi3gwu
+  rounds.py: bafybeifyg75fpeptjxojw5uq23pb6wtmalwon3kbh27dx6fr75nxnbd4wu
   tests/__init__.py: bafybeifigp64li3j3yidpan5arc27etm3jytadjsckjaidrem57hst73ry
   tests/test_behaviours.py: bafybeicwb3citz6xjalkykiguplosnv427x7pirkxhcpzekfvxl3jk2s6q
   tests/test_dialogues.py: bafybeihrg3vsvnditsus75hq2inaara4zsekdfrtnltwrg6ktbo7jdvvju
@@ -108,6 +108,8 @@ models:
       reset_pause_duration: 10
       reset_tendermint_after: 4
       combinder_api_url: http://localhost:8080
+      model_api_url: http://localhost:8080
+      device_id: '123456'
       retry_attempts: 400
       retry_timeout: 3
       round_timeout_seconds: 30.0

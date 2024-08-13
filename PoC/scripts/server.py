@@ -48,7 +48,6 @@ def preprocess_data_from_api(data_list):
     day_of_weeks = []
 
     for data in data_list:
-        print(data)
         pv_values.append(data['pv'])
         grid_import_values.append(data['grid_import'])
         timestamp = datetime.strptime(data['cet_cest_timestamp'], '%Y-%m-%d %H:%M:%S')
@@ -99,8 +98,8 @@ def predict_energy():
     :return: JSON response with the prediction result.
     """
     try:
-        data = request.json
-
+        data = request.json["data"]
+        
         # Verify that the data has exactly 60 data points
         if len(data) != 60:
             return jsonify({"error": "Exactly 60 data points are required."}), 400
@@ -179,6 +178,18 @@ def get_past_data():
         return jsonify(response)
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+@app.route('/device/control', methods=['POST'])
+def control_device():
+    # theoretically this endpoint would switch on/off a device based on the prediction
+    # parameters:
+    # device_id: str
+    # action: int (0: off, 1: on)
+    data = request.json
+    message = f"Device {data['device_id']} switched {'on' if data['action'] == 1 else 'off'} successfully."
+    return jsonify({"message": message, "success": True})
+
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8080)

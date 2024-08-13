@@ -32,8 +32,6 @@ from packages.valory.skills.abstract_round_abci.base import (
     DegenerateRound,
     EventToTimeout,
     get_name,
-    CollectDifferentUntilAllRound,
-    CollectSameUntilAllRound,
     CollectSameUntilThresholdRound
 )
 
@@ -64,17 +62,19 @@ class SynchronizedData(BaseSynchronizedData):
     This data is replicated by the tendermint application.
     """
     @property
-    def prosumer_data(self) -> int:
-        """Get the print count."""
+    def prosumer_data(self) -> List:
+        """Get the prosumer data list."""
         return self.db.get("prosumer_data", [])
-
-
+    
+    @property
+    def last_prediction_class(self) -> int:
+        """Get the last prediction class."""
+        return self.db.get("last_prediction_class", -1)
 
 class RegistrationRound(CollectSameUntilThresholdRound):
     """RegistrationRound"""
 
     payload_class = RegistrationPayload
-    payload_attribute = ""  # TODO: update
     synchronized_data_class = SynchronizedData
     payload_sent = False
 
@@ -84,8 +84,6 @@ class RegistrationRound(CollectSameUntilThresholdRound):
         if not self.payload_sent:
             return None
         
-        print(len(self.synchronized_data.prosumer_data))
-
         if len(self.synchronized_data.prosumer_data) >= 59:
             return self.synchronized_data, Event.DONE
         return None
@@ -108,7 +106,6 @@ class CollectDataRound(CollectSameUntilThresholdRound):
     """CollectDataRound"""
 
     payload_class = CollectDataPayload
-    payload_attribute = ""  # TODO: update
     synchronized_data_class = SynchronizedData
     payload_sent = False
 
@@ -131,7 +128,6 @@ class CollectDataRound(CollectSameUntilThresholdRound):
     def process_payload(self, payload: CollectDataPayload) -> None:
         """Process payload."""
         prosumer_data = self.synchronized_data.prosumer_data
-        print(payload)
         prosumer_data.append(payload.prosumer_data)
         self.synchronized_data.update(
             prosumer_data=prosumer_data[-60:],
@@ -141,48 +137,27 @@ class CollectDataRound(CollectSameUntilThresholdRound):
         return
 
 
-class DeviceInteractionRound(AbstractRound):
-    """DeviceInteractionRound"""
-
-    payload_class = DeviceInteractionPayload
-    payload_attribute = ""  # TODO: update
-    synchronized_data_class = SynchronizedData
-
-    # TODO: replace AbstractRound with one of CollectDifferentUntilAllRound,
-    # CollectSameUntilAllRound, CollectSameUntilThresholdRound,
-    # CollectDifferentUntilThresholdRound, OnlyKeeperSendsRound, VotingRound,
-    # from packages/valory/skills/abstract_round_abci/base.py
-    # or implement the methods
-
-    def end_block(self) -> Optional[Tuple[BaseSynchronizedData, Enum]]:
-        """Process the end of the block."""
-        raise NotImplementedError
-
-    def check_payload(self, payload: DeviceInteractionPayload) -> None:
-        """Check payload."""
-        return
-
-    def process_payload(self, payload: DeviceInteractionPayload) -> None:
-        """Process payload."""
-        return
-
-
 class QueryModelRound(AbstractRound):
     """QueryModelRound"""
 
     payload_class = QueryModelPayload
-    payload_attribute = ""  # TODO: update
     synchronized_data_class = SynchronizedData
-
-    # TODO: replace AbstractRound with one of CollectDifferentUntilAllRound,
-    # CollectSameUntilAllRound, CollectSameUntilThresholdRound,
-    # CollectDifferentUntilThresholdRound, OnlyKeeperSendsRound, VotingRound,
-    # from packages/valory/skills/abstract_round_abci/base.py
-    # or implement the methods
+    err = False
+    status_change = False
+    payload_sent = False
 
     def end_block(self) -> Optional[Tuple[BaseSynchronizedData, Enum]]:
         """Process the end of the block."""
-        raise NotImplementedError
+        if not self.payload_sent:
+            return None
+        self.payload_sent = False
+        
+        if self.err:
+            return self.synchronized_data, Event.ERROR
+        if self.status_change:
+            return self.synchronized_data, Event.TRANSACT
+        return self.synchronized_data, Event.NO_TRANSACT
+        
 
     def check_payload(self, payload: QueryModelPayload) -> None:
         """Check payload."""
@@ -190,25 +165,75 @@ class QueryModelRound(AbstractRound):
 
     def process_payload(self, payload: QueryModelPayload) -> None:
         """Process payload."""
+        self.payload_sent = True
+        self.err = False
+        self.status_change = False
+        if payload.prediction_class == -1:
+            self.err = True
+            return
+        
+        last_prediction_class = self.synchronized_data.last_prediction_class
+        if payload.prediction_class == last_prediction_class:
+            return
+        
+        self.status_change = True
+        self.synchronized_data.update(
+            last_prediction_class=payload.prediction_class,
+            synchronized_data_class=SynchronizedData,
+        )
         return
 
 
-class ResetAndPauseRound(CollectSameUntilThresholdRound):
-    """ResetAndPauseRound"""
+class DeviceInteractionRound(AbstractRound):
+    """DeviceInteractionRound"""
 
-    payload_class = ResetAndPausePayload
-    payload_attribute = ""  # TODO: update
+    payload_class = DeviceInteractionPayload
     synchronized_data_class = SynchronizedData
+    payload_sent = False
+    interaction_success = False
 
     def end_block(self) -> Optional[Tuple[BaseSynchronizedData, Enum]]:
         """Process the end of the block."""
-        if self.threshold_reached:
-            return self.synchronized_data.create(), Event.DONE
-        if not self.is_majority_possible(
-            self.collection, self.synchronized_data.nb_participants
-        ):
-            return self.synchronized_data, Event.NO_MAJORITY
-        return None
+        if not self.payload_sent:
+            return None
+        
+        if self.interaction_success:
+            return self.synchronized_data, Event.DONE
+        
+        return self.synchronized_data, Event.ERROR
+
+
+    def check_payload(self, payload: DeviceInteractionPayload) -> None:
+        """Check payload."""
+        return
+
+    def process_payload(self, payload: DeviceInteractionPayload) -> None:
+        """Process payload."""
+        self.payload_sent = True
+        self.interaction_success = payload.success
+
+class ResetAndPauseRound(AbstractRound):
+    """ResetAndPauseRound"""
+
+    payload_class = ResetAndPausePayload
+    synchronized_data_class = SynchronizedData
+    payload_sent = False
+
+    def end_block(self) -> Optional[Tuple[BaseSynchronizedData, Enum]]:
+        """Process the end of the block."""
+        if not self.payload_sent:
+            return None
+        self.payload_sent = False
+        return self.synchronized_data, Event.DONE
+
+
+    def check_payload(self, payload: ResetAndPausePayload) -> None:
+        """Check payload."""
+        return
+
+    def process_payload(self, payload: ResetAndPausePayload) -> None:
+        """Process payload."""
+        self.payload_sent = True
 
 class PeaqAbciApp(AbciApp[Event]):
     """PeaqAbciApp"""
@@ -234,7 +259,8 @@ class PeaqAbciApp(AbciApp[Event]):
             Event.DONE: CollectDataRound
         },
         DeviceInteractionRound: {
-            Event.DONE: ResetAndPauseRound
+            Event.DONE: ResetAndPauseRound,
+            Event.ERROR: ResetAndPauseRound
         }
     }
     final_states: Set[AppState] = set()
