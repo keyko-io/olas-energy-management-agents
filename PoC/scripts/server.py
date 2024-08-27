@@ -1,7 +1,7 @@
 import sys
 sys.path.append('..')
 
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, send_from_directory
 import pandas as pd
 import torch
 import os
@@ -10,6 +10,7 @@ import joblib
 from datetime import datetime, timedelta
 from dateutil import tz
 from utils.transformers import TransformerModel
+from functools import wraps
 
 app = Flask(__name__)
 DATA_FILE = '../data/residential4_features.csv'
@@ -27,11 +28,32 @@ model = TransformerModel(
     dropout=0.1,
     mlp_dropout=0.1
 )
-model.load_state_dict(torch.load(MODEL_FILE))
+
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+model.load_state_dict(torch.load(MODEL_FILE, map_location=device))
+model.to(device)
 model.eval()  # Set model to evaluation mode
 
 scaler = joblib.load(SCALER_FILE)
 
+VALID_TOKEN = "MyToken"
+
+def token_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        auth_header = request.headers.get('Authorization')
+        if auth_header:
+            token = auth_header.split(" ")[1]
+        else:
+            token = None
+
+        if token != VALID_TOKEN:
+            return jsonify({"message": "Invalid or missing token!"}), 401
+
+        return f(*args, **kwargs)
+    
+    return decorated
 
 def preprocess_data_from_api(data_list):
     """
@@ -62,7 +84,7 @@ def preprocess_data_from_api(data_list):
     features_normalized = scaler.transform(features)
 
     # Convert to torch tensor
-    features_tensor = torch.tensor(features_normalized, dtype=torch.float32).unsqueeze(0)  # Add batch dimension
+    features_tensor = torch.tensor(features_normalized, dtype=torch.float32).unsqueeze(0).to(device)  # Add batch dimension
 
     return features_tensor
 
@@ -87,10 +109,16 @@ def make_prediction(model, processed_data):
     :return: Prediction result.
     """
     with torch.no_grad():
+        processed_data = processed_data.to(device)
         prediction = model(processed_data)
         return prediction.squeeze().item()
+    
+@app.route('/schema.json')
+def serve_json():
+    return send_from_directory(directory='.', path='schema.json')
 
 @app.route('/predict', methods=['POST'])
+@token_required
 def predict_energy():
     """
     Endpoint to receive the last 60 minutes of pv, grid_import, and timestamp data and return a prediction.
@@ -118,6 +146,7 @@ def predict_energy():
         return jsonify({"error": str(e)}), 500
     
 @app.route('/energy-data', methods=['GET'])
+@token_required
 def get_energy_data():
     """
     Endpoint to get the energy consumption and generation data for the current date and time.
@@ -143,6 +172,7 @@ def get_energy_data():
         return jsonify({"error": str(e)}), 500
     
 @app.route('/past-data', methods=['GET'])
+@token_required
 def get_past_data():
     """
     Endpoint to get the energy consumption and generation data for the past 60 minutes.
@@ -180,6 +210,7 @@ def get_past_data():
         return jsonify({"error": str(e)}), 500
 
 @app.route('/device/control', methods=['POST'])
+@token_required
 def control_device():
     # theoretically this endpoint would switch on/off a device based on the prediction
     # parameters:

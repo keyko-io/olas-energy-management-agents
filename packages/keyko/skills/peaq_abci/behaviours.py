@@ -62,7 +62,6 @@ class PeaqBaseBehaviour(BaseBehaviour, ABC):
         """Return the params."""
         return cast(Params, super().params)
 
-
 class RegistrationBehaviour(PeaqBaseBehaviour):
     """RegistrationBehaviour"""
 
@@ -74,8 +73,11 @@ class RegistrationBehaviour(PeaqBaseBehaviour):
         # Step 0: Mock prosumer data
 
         with self.context.benchmark_tool.measure(self.behaviour_id).local():
-            energy_data = yield from self.get_combinder_past_data()
-            self.context.logger.info(f"RegistrationBehaviour: For testing purposes, we'll prefill the prosumer data with last 60 minutes from CSV")
+            if self.params.prefill_data:
+                energy_data = yield from self.get_combinder_past_data()
+                self.context.logger.info(f"RegistrationBehaviour: For testing purposes, we'll prefill the prosumer data with last 60 minutes from CSV")
+            else:
+                energy_data = []
             sender = self.context.agent_address
             payload = RegistrationPayload(sender=sender, prosumer_data=energy_data)
 
@@ -92,7 +94,8 @@ class RegistrationBehaviour(PeaqBaseBehaviour):
         url = self.params.combinder_api_url + f"/past-data"
         response = yield from self.get_http_response(
             method="GET",
-            url=url
+            url=url,
+            headers={"Authorization": f"Bearer {self.params.combinder_api_key}"}
         )
         if response.status_code != 200:
             self.context.logger.error(
@@ -136,7 +139,8 @@ class CollectDataBehaviour(PeaqBaseBehaviour):
         url = self.params.combinder_api_url + f"/energy-data"
         response = yield from self.get_http_response(
             method="GET",
-            url=url
+            url=url,
+            headers={"Authorization": f"Bearer {self.params.combinder_api_key}"}
         )
         if response.status_code != 200:
             self.context.logger.error(
@@ -146,7 +150,7 @@ class CollectDataBehaviour(PeaqBaseBehaviour):
             )
             self.context.logger.error(f"APICheckBehaviour: Response body: {response.body}")
             self.context.logger.error(f"APICheckBehaviour: Response headers: {response.headers}")
-            return ""
+            return None
         
         data = json.loads(response.body)
         
@@ -187,8 +191,11 @@ class QueryModelBehaviour(PeaqBaseBehaviour):
         response = yield from self.get_http_response(
             method="POST",
             url=url,
-            content=json.dumps(http_params).encode('utf-8'),
-            headers={"Content-Type": "application/json"}
+            headers={
+                "Authorization": f"Bearer {self.params.model_api_key}",
+                "Content-Type": "application/json"
+            },
+            content=json.dumps(http_params).encode('utf-8')
         )
 
         if response.status_code != 200:
@@ -233,11 +240,14 @@ class DeviceInteractionBehaviour(PeaqBaseBehaviour):
         response = yield from self.get_http_response(
             method="POST",
             url=url,
+            headers={
+                "Authorization": f"Bearer {self.params.combinder_api_key}",
+                "Content-Type": "application/json"
+            },
             content=json.dumps({
                 "device_id": device_id,
                 "action": int(device_action)
-            }).encode('utf-8'),
-            headers={"Content-Type": "application/json"}
+            }).encode('utf-8')
         )
         if response.status_code != 200:
             self.context.logger.error(

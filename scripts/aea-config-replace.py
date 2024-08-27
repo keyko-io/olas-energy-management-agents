@@ -33,6 +33,20 @@ def main() -> None:
 
     with open(Path("peaq_agent", "aea-config.yaml"), "r", encoding="utf-8") as file:
         config = list(yaml.safe_load_all(file))
+        if os.getenv("COMBINDER_API_URL"):
+            config[1]["models"]["params"]["args"]["combinder_api_url"] = f"${{str:{os.getenv('COMBINDER_API_URL')}}}"
+
+        if os.getenv("MODEL_API_URL"):
+            config[1]["models"]["params"]["args"]["model_api_url"] = f"${{str:{os.getenv('MODEL_API_URL')}}}"
+
+        if os.getenv("COMBINDER_API_KEY"):
+            config[1]["models"]["params"]["args"]["combinder_api_key"] = f"${{str:{os.getenv('COMBINDER_API_KEY')}}}"
+
+        if os.getenv("MODEL_API_KEY"):
+            config[1]["models"]["params"]["args"]["model_api_key"] = f"${{str:{os.getenv('MODEL_API_KEY')}}}"
+
+        if os.getenv("PREFILL_DATA"):
+            config[1]["models"]["params"]["args"]["prefill_data"] = f"${{bool:{os.getenv('PREFILL_DATA')}}}"
 
         # Ledger RPCs
         if os.getenv("ETHEREUM_LEDGER_RPC"):

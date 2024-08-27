@@ -84,9 +84,7 @@ class RegistrationRound(CollectSameUntilThresholdRound):
         if not self.payload_sent:
             return None
         
-        if len(self.synchronized_data.prosumer_data) >= 59:
-            return self.synchronized_data, Event.DONE
-        return None
+        return self.synchronized_data, Event.DONE
 
     def check_payload(self, payload: CollectDataPayload) -> None:
         """Check payload."""
@@ -128,7 +126,8 @@ class CollectDataRound(CollectSameUntilThresholdRound):
     def process_payload(self, payload: CollectDataPayload) -> None:
         """Process payload."""
         prosumer_data = self.synchronized_data.prosumer_data
-        prosumer_data.append(payload.prosumer_data)
+        if payload.prosumer_data is not None:
+            prosumer_data.append(payload.prosumer_data)
         self.synchronized_data.update(
             prosumer_data=prosumer_data[-60:],
             synchronized_data_class=SynchronizedData,

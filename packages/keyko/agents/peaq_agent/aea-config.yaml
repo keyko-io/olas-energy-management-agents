@@ -21,7 +21,7 @@ protocols:
 skills:
 - valory/abstract_abci:0.1.0:bafybeihljirk3d4rgvmx2nmz3p2mp27iwh2o5euce5gccwjwrpawyjzuaq
 - valory/abstract_round_abci:0.1.0:bafybeigjrepaqpb3m7zunmt4hryos4vto4yyj3u6iyofdb2fotwho3bqvm
-- keyko/peaq_abci:0.1.0:bafybeig2424fbp2k2gctr5t33bgeleuvcrxkkbvuuusinvk2eo3prjbdgy
+- keyko/peaq_abci:0.1.0:bafybeigsof6nh3cnx4khr5keplzu6vjllu54xhebezvqqb2jb5u42f3jz4
 default_ledger: ethereum
 required_ledgers:
 - ethereum
@@ -85,6 +85,7 @@ models:
       combinder_api_url: ${str:http://localhost:8080}
       model_api_url: ${str:http://localhost:8080}
       device_id: ${str:123456}
+      prefill_data: ${bool:false}
 ---
 public_id: valory/abci:0.1.0
 type: connection
