@@ -1,7 +1,7 @@
 {
     "dev": {
-        "skill/keyko/peaq_abci/0.1.0": "bafybeigsof6nh3cnx4khr5keplzu6vjllu54xhebezvqqb2jb5u42f3jz4",
-        "agent/keyko/peaq_agent/0.1.0": "bafybeifojio7tcjf7r5a2f2ozwgizcsjwl7suujudeqdhw2h5nrjfhcqrq"
+        "skill/keyko/peaq_abci/0.1.0": "bafybeidngqk53zg7jd3orql5i23ozam7gt5d3pg2nrx5mb4gceupicqanu",
+        "agent/keyko/peaq_agent/0.1.0": "bafybeihg7t4crdbqtqkn3xlrxrnm77slkihig6cm3bdt653ttgf3ioun5i"
     },
     "third_party": {
         "protocol/open_aea/signing/1.0.0": "bafybeihv62fim3wl2bayavfcg3u5e5cxu3b7brtu4cn5xoxd6lqwachasi",
