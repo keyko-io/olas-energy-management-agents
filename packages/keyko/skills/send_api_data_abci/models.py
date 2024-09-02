@@ -30,7 +30,7 @@ from packages.valory.skills.abstract_round_abci.models import Requests as BaseRe
 from packages.valory.skills.abstract_round_abci.models import (
     SharedState as BaseSharedState,
 )
-from packages.valory.skills.send_api_data_abci.rounds import SendAPIDataAbciApp
+from packages.keyko.skills.send_api_data_abci.rounds import SendAPIDataAbciApp
 
 
 class SharedState(BaseSharedState):

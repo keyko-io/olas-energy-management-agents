@@ -266,7 +266,9 @@ class PeaqAbciApp(AbciApp[Event]):
             Event.ERROR: ResetAndPauseRound
         }
     }
-    final_states: Set[AppState] = set()
+    final_states: Set[AppState] = {
+        FinishedRound,
+    }
     event_to_timeout: EventToTimeout = {}
     cross_period_persisted_keys: frozenset[str] = frozenset(
         [get_name(SynchronizedData.prosumer_data)]

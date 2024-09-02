@@ -7,7 +7,8 @@ alphabet_in:
 - RESET_TIMEOUT
 - ERROR
 default_start_state: RegistrationRound
-final_states: []
+final_states: 
+- FinishedRound
 label: PeaqAbciApp
 start_states:
 - RegistrationRound
@@ -17,6 +18,7 @@ states:
 - DeviceInteractionRound
 - RegistrationRound
 - ResetAndPauseRound
+- FinishedRound
 transition_func:
     (CollectDataRound, DONE): QueryModelRound
     (CollectDataRound, NOT_ENOUGH_DATA): ResetAndPauseRound
@@ -24,7 +26,7 @@ transition_func:
     (QueryModelRound, NO_TRANSACT): ResetAndPauseRound
     (QueryModelRound, TRANSACT): DeviceInteractionRound
     (QueryModelRound, ERROR): ResetAndPauseRound
-    (ResetAndPauseRound, DONE): CollectDataRound
+    (ResetAndPauseRound, DONE): FinishedRound
     (ResetAndPauseRound, RESET_TIMEOUT): ResetAndPauseRound
     (RegistrationRound, DONE): CollectDataRound
     (DeviceInteractionRound, DONE): ResetAndPauseRound
