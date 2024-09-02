@@ -26,6 +26,7 @@ PREDICT_ENDPOINT = "https://peaq-service.hmbam5qcfhh70.eu-central-1.cs.amazonlig
 def run(**kwargs) -> Tuple[Optional[str], Optional[Dict[str, Any]], Any, Any]:
     """Run the task"""
 
+    print('Running the task')
     api_key = kwargs["api_keys"]["peaq_service"]
     data = kwargs["data"]
 
@@ -36,6 +37,7 @@ def run(**kwargs) -> Tuple[Optional[str], Optional[Dict[str, Any]], Any, Any]:
 
     try:
         response = requests.post(PREDICT_ENDPOINT, json=data, headers=headers)
+        print(response.status_code)
         response.raise_for_status()
         response_json = response.json()
     except requests.exceptions.HTTPError as http_err:
@@ -44,3 +46,9 @@ def run(**kwargs) -> Tuple[Optional[str], Optional[Dict[str, Any]], Any, Any]:
         return f"An error occurred: {str(e)}", None, None, None
 
     return response_json, data, None, None
+
+if __name__ == "__main__":
+    run(
+        api_keys={"peaq_service": "your_api_key"},
+        data={"key": "value"}
+    )

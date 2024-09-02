@@ -20,8 +20,7 @@
 """This package contains the rounds of PeaqAbciApp."""
 
 from enum import Enum
-from typing import Dict, FrozenSet, List, Optional, Set, Tuple, cast
-import json
+from typing import Dict, List, Optional, Set, Tuple
 
 from packages.valory.skills.abstract_round_abci.base import (
     AbciApp,
@@ -234,6 +233,10 @@ class ResetAndPauseRound(AbstractRound):
         """Process payload."""
         self.payload_sent = True
 
+
+class FinishedRound(DegenerateRound):
+    """FinishedRound"""
+
 class PeaqAbciApp(AbciApp[Event]):
     """PeaqAbciApp"""
 
@@ -250,8 +253,9 @@ class PeaqAbciApp(AbciApp[Event]):
             Event.TRANSACT: DeviceInteractionRound,
             Event.ERROR: ResetAndPauseRound
         },
+        FinishedRound: {},
         ResetAndPauseRound: {
-            Event.DONE: CollectDataRound,
+            Event.DONE: FinishedRound,
             Event.RESET_TIMEOUT: RegistrationRound
         },
         RegistrationRound: {

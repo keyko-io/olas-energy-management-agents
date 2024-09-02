@@ -1,0 +1,201 @@
+name: learning_chained_abci
+author: valory
+version: 0.1.0
+type: skill
+description: The chained abci for the learning skill.
+license: Apache-2.0
+aea_version: '>=1.0.0, <2.0.0'
+fingerprint:
+  __init__.py: bafybeihu5y5llhaefw32jodf2nc2x5tig7cfo2fallbodv6vodczunpbve
+  behaviours.py: bafybeidfd65mgv2s4sosgmeru6ny5zqaapqf7qfdfwsxrprzdoivxficcu
+  composition.py: bafybeihbyogyvhum5rigmnxhsz3yk4xdu6yenkx66wljw5rwi55v4mf4b4
+  dialogues.py: bafybeiakqfqcpg7yrxt4bsyernhy5p77tci4qhmgqqjqi3ttx7zk6sklca
+  fsm_specification.yaml: bafybeiggjaxh6dxkgo5hcdcymfyinzoii5gnvz7rropc4wedllmbeqlepe
+  handlers.py: bafybeicxv23eax7i6tavh4366mdjk7ru23pshkoiq5rqvvw5zzy2x6lyl4
+  models.py: bafybeidyo3mosfyusgtdtakqsykwzf43d3p2kiqxwinr5bta6f3ygwvase
+fingerprint_ignore_patterns: []
+connections: []
+contracts: []
+protocols: []
+skills:
+- valory/abstract_round_abci:0.1.0:bafybeih3enhagoql7kzpeyzzu2scpkif6y3ubakpralfnwxcvxexdyvy5i
+- valory/registration_abci:0.1.0:bafybeiek7zcsxbucjwzgqfftafhfrocvc7q4yxllh2q44jeemsjxg3rcfm
+- valory/reset_pause_abci:0.1.0:bafybeidw4mbx3os3hmv7ley7b3g3gja7ydpitr7mxbjpwzxin2mzyt5yam
+- valory/termination_abci:0.1.0:bafybeicj5yw47w6le47tp2kvm22wfme4hxsvbegtfgx7ya3ipyswanwiwq
+- valory/send_api_data_abci:0.1.0:bafybeigfepuewfldd4sitrniixpaq2qd2tnwjkhalmgcmohcpfhe2lgyfi
+- valory/learning_abci:0.1.0:bafybeihfv3wk6b5u6ns25wrjo5ejoymkntsl3z6er5wh7mi2fs4lb4h4pi
+- valory/transaction_settlement_abci:0.1.0:bafybeigtzlk4uakmd54rxnznorcrstsr52kta474lgrnvx5ovr546vj7sq
+behaviours:
+  main:
+    args: {}
+    class_name: LearningChainedConsensusBehaviour
+handlers:
+  abci:
+    args: {}
+    class_name: ABCIHandler
+  contract_api:
+    args: {}
+    class_name: ContractApiHandler
+  http:
+    args: {}
+    class_name: HttpHandler
+  ipfs:
+    args: {}
+    class_name: IpfsHandler
+  ledger_api:
+    args: {}
+    class_name: LedgerApiHandler
+  signing:
+    args: {}
+    class_name: SigningHandler
+  tendermint:
+    args: {}
+    class_name: TendermintHandler
+models:
+  abci_dialogues:
+    args: {}
+    class_name: AbciDialogues
+  benchmark_tool:
+    args:
+      log_dir: /logs
+    class_name: BenchmarkTool
+  contract_api_dialogues:
+    args: {}
+    class_name: ContractApiDialogues
+  ipfs_dialogues:
+    args: {}
+    class_name: IpfsDialogues
+  ledger_api_dialogues:
+    args: {}
+    class_name: LedgerApiDialogues
+  http_dialogues:
+    args: {}
+    class_name: HttpDialogues
+  params:
+    args:
+      cleanup_history_depth: 1
+      cleanup_history_depth_current: null
+      drand_public_key: 868f005eb8e6e4ca0a47c8a77ceaa5309a47978a7c71bc5cce96366b5d7a569937c529eeda66c7293784a9402801af31
+      genesis_config:
+        genesis_time: '2022-09-26T00:00:00.000000000Z'
+        chain_id: chain-c4daS1
+        consensus_params:
+          block:
+            max_bytes: '22020096'
+            max_gas: '-1'
+            time_iota_ms: '1000'
+          evidence:
+            max_age_num_blocks: '100000'
+            max_age_duration: '172800000000000'
+            max_bytes: '1048576'
+          validator:
+            pub_key_types:
+            - ed25519
+          version: {}
+        voting_power: '10'
+      keeper_timeout: 30.0
+      max_attempts: 10
+      max_healthcheck: 120
+      multisend_address: '0x0000000000000000000000000000000000000000'
+      termination_sleep: 900
+      termination_from_block: 0
+      init_fallback_gas: 0
+      keeper_allowed_retries: 3
+      reset_pause_duration: 10
+      on_chain_service_id: null
+      request_retry_delay: 1.0
+      request_timeout: 10.0
+      reset_tendermint_after: 2
+      retry_attempts: 400
+      retry_timeout: 3
+      round_timeout_seconds: 30.0
+      service_id: learning
+      service_registry_address: null
+      setup:
+        all_participants: []
+        safe_contract_address: '0x0000000000000000000000000000000000000000'
+        consensus_threshold: null
+      share_tm_config_on_startup: false
+      sleep_time: 1
+      tendermint_check_sleep_delay: 3
+      tendermint_com_url: http://localhost:8080
+      tendermint_max_retries: 5
+      tendermint_p2p_url: localhost:26656
+      tendermint_url: http://localhost:26657
+      use_termination: false
+      validate_timeout: 1205
+      finalize_timeout: 60.0
+      history_check_timeout: 1205
+      use_slashing: false
+      slash_cooldown_hours: 3
+      slash_threshold_amount: 10000000000000000
+      light_slash_unit_amount: 5000000000000000
+      serious_slash_unit_amount: 8000000000000000
+      multisend_batch_size: 50
+      tx_timeout: 10.0
+      ipfs_address: https://gateway.autonolas.tech/ipfs/
+      default_chain_id: gnosis
+      coingecko_price_template: https://api.coingecko.com/api/v3/simple/price?ids=autonolas&vs_currencies=usd&x_cg_demo_api_key={api_key}
+      coingecko_api_key: null
+      erc20_token_address: 0x
+      usbls_statement_page: https://www.bls.gov/news.release/cpi.nr0.htm
+      transfer_target_address: '0x0000000000000000000000000000000000000000'
+      fxstreet_api_url: https://calendar-api.fxstreet.com/en/api/v1/eventDates/
+      wxdai_contract_address: '0xe91D153E0b41518A2Ce8Dd3D7944Fa863463a97d'
+      wbtc_contract_address: '0x8e5bBbb09Ed1ebdE8674Cda39A0c169401db4252'
+      uniswap_router_address: '0x1C232F01118CB8B424793ae03F870aa7D0ac7f77'
+      deposit_tracker_address: '0x632ffD8A237C004Ea8f91d06547427B0410033DC'
+      multisend_contract_address: '0xA349a37dD7EaF03218c7321a87Bf6a2a13Eb86B5'
+      trade_amount: 10000000000000000000
+      slippage_tolerance: 0.01
+      olas_api_url_project_data: http://192.168.100.61:8001/api/projects/data
+      olas_api_url_agent_data: http://192.168.100.61:8001/api/agents/data
+      olas_api_x_api_key: 57c622cf-3469-4181-b7f5-92053d75db9f
+      project_db_data:
+        project:
+          name: CPI
+          description: CPI Description
+          slug: cpi
+        fsm_suite:
+          name: CPI Suite 1
+          description: CPI FSM Suite 1 description
+          slug: cpi-suite-1
+          fsms:
+          - name: CPI Suite 1 - FSM 1
+            description: CPI Suite 1 - FSM 1 description
+            slug: cpi-suite-1-fsm-1
+          - name: CPI Suite 1 - FSM 2
+            description: CPI Suite 1 - FSM 2 description
+            slug: cpi-suite-1-fsm-2
+        instance:
+          name: CPI Suite 1 - Instance 1
+          slug: cpi-suite-1-instance-1
+      agent_db_name: Agent
+      agent_db_description: Agent Description
+      agent_db_slug: agent
+    class_name: Params
+  randomness_api:
+    args:
+      api_id: cloudflare
+      headers: {}
+      method: GET
+      parameters: {}
+      response_key: null
+      response_type: dict
+      retries: 5
+      url: https://drand.cloudflare.com/public/latest
+    class_name: RandomnessApi
+  requests:
+    args: {}
+    class_name: Requests
+  signing_dialogues:
+    args: {}
+    class_name: SigningDialogues
+  state:
+    args: {}
+    class_name: SharedState
+  tendermint_dialogues:
+    args: {}
+    class_name: TendermintDialogues
+dependencies: {}
+is_abstract: false

@@ -2,7 +2,7 @@ name: peaq_abci
 author: keyko
 version: 0.1.0
 type: skill
-description: The scaffold skill is a scaffold for your own skill implementation.
+description: Skill for PEAQ integration
 license: Apache-2.0
 aea_version: '>=1.0.0, <2.0.0'
 fingerprint:
