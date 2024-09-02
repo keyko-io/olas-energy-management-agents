@@ -1,25 +1,25 @@
 name: send_api_data_abci
-author: valory
+author: keyko
 version: 0.1.0
 type: skill
 description: Skill designed to send project & agent data to a dedicated API.
 license: Apache-2.0
-aea_version: ">=1.0.0, <2.0.0"
+aea_version: '>=1.0.0, <2.0.0'
 fingerprint:
-  __init__.py: bafybeidz2l5ky4ghmzavce2qvvegkdaomf2ht64rf26kjn2bqizfs4h7lq
-  behaviours.py: bafybeia5tohg4m2z45urcdb3q44i3r3nc2o5y2tqszihnvfdljlolaxcf4
+  __init__.py: bafybeifhxmvlbsufiiqotvqrf72nlsnsg47m3vdv3njh5s4vcynotkwhge
+  behaviours.py: bafybeihredtcg2zcshcztjpq3al3y7tbnqmnbz5xhysw5m3ficngenn2xe
   dialogues.py: bafybeia4iftxb7crys6sfyocdgs2h46i5qnnoprynmctv333hgorrj55ry
   fsm_specification.yaml: bafybeieay3ilo56fk7dz7g74z2gszspqqn2tvdojuls7y6dibegtng2dee
   handlers.py: bafybeiaorn5eawzy6r2xgyhzjzdvuvruyy7hnxmpacr4mhh5rkzqimbhpy
   models.py: bafybeiedvx4hkvan65fktcecjclbgk3npdvhswmur6fka63c6zud73io2e
   payloads.py: bafybeicnzigzo2ncvp2ky3md7rnp5jzhqrqo6j5qhha6rwio5jxvw5sdvy
-  rounds.py: bafybeigfn4dup5jxvviabeqmx6vmh24bqa52bzyhbzx7g75rqmxraaup24
+  rounds.py: bafybeihlbvxomkhuok6nzyn7ou7hzz7wlpdlzpc7jo2ien6gv2de3ldpum
 fingerprint_ignore_patterns: []
 connections: []
 contracts: []
 protocols: []
 skills:
-  - valory/abstract_round_abci:0.1.0:bafybeih3enhagoql7kzpeyzzu2scpkif6y3ubakpralfnwxcvxexdyvy5i
+- valory/abstract_round_abci:0.1.0:bafybeigjrepaqpb3m7zunmt4hryos4vto4yyj3u6iyofdb2fotwho3bqvm
 behaviours:
   main:
     args: {}
@@ -76,19 +76,19 @@ models:
         chain_id: chain-c4daS1
         consensus_params:
           block:
-            max_bytes: "22020096"
-            max_gas: "-1"
-            time_iota_ms: "1000"
+            max_bytes: '22020096'
+            max_gas: '-1'
+            time_iota_ms: '1000'
           evidence:
-            max_age_duration: "172800000000000"
-            max_age_num_blocks: "100000"
-            max_bytes: "1048576"
+            max_age_duration: '172800000000000'
+            max_age_num_blocks: '100000'
+            max_bytes: '1048576'
           validator:
             pub_key_types:
-              - ed25519
+            - ed25519
           version: {}
-        genesis_time: "2022-05-20T16:00:21.735122717Z"
-        voting_power: "10"
+        genesis_time: '2022-05-20T16:00:21.735122717Z'
+        voting_power: '10'
       history_check_timeout: 1205
       ipfs_domain_name: null
       keeper_allowed_retries: 3
@@ -107,9 +107,9 @@ models:
       service_registry_address: null
       setup:
         all_participants:
-          - "0x0000000000000000000000000000000000000000"
+        - '0x0000000000000000000000000000000000000000'
         consensus_threshold: null
-        safe_contract_address: "0x0000000000000000000000000000000000000000"
+        safe_contract_address: '0x0000000000000000000000000000000000000000'
       share_tm_config_on_startup: false
       sleep_time: 1
       tendermint_check_sleep_delay: 3
@@ -138,9 +138,9 @@ models:
           description: PEAQ FSM Suite 1 description
           slug: peaq-suite-1
           fsms:
-            - name: PEAQ Suite 1 - FSM 1
-              description: PEAQ Suite 1 - FSM 1 description
-              slug: peaq-suite-1-fsm-1
+          - name: PEAQ Suite 1 - FSM 1
+            description: PEAQ Suite 1 - FSM 1 description
+            slug: peaq-suite-1-fsm-1
         instance:
           name: PEAQ Suite 1 - Instance 1
           slug: peaq-suite-1-instance-1

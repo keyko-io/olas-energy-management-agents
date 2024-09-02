@@ -1,34 +1,29 @@
-name: learning_chained_abci
-author: valory
+name: peaq_chained_abci
+author: keyko
 version: 0.1.0
 type: skill
-description: The chained abci for the learning skill.
+description: The chained abci for the peaq skill.
 license: Apache-2.0
 aea_version: '>=1.0.0, <2.0.0'
 fingerprint:
-  __init__.py: bafybeihu5y5llhaefw32jodf2nc2x5tig7cfo2fallbodv6vodczunpbve
-  behaviours.py: bafybeidfd65mgv2s4sosgmeru6ny5zqaapqf7qfdfwsxrprzdoivxficcu
-  composition.py: bafybeihbyogyvhum5rigmnxhsz3yk4xdu6yenkx66wljw5rwi55v4mf4b4
+  __init__.py: bafybeifnduerlt62gqt6bswu2jjggqbwovylj36t6yedwxvj7jlrsjjl2q
+  behaviours.py: bafybeihduvgmdh4nymxukweiqv335el7b4fjtfvzzdv7sdhgykng63mbge
+  composition.py: bafybeigh6dcd3zgoaech5azyumet6mco5gb32ucsdceyuczhtuvcydm7oe
   dialogues.py: bafybeiakqfqcpg7yrxt4bsyernhy5p77tci4qhmgqqjqi3ttx7zk6sklca
-  fsm_specification.yaml: bafybeiggjaxh6dxkgo5hcdcymfyinzoii5gnvz7rropc4wedllmbeqlepe
-  handlers.py: bafybeicxv23eax7i6tavh4366mdjk7ru23pshkoiq5rqvvw5zzy2x6lyl4
-  models.py: bafybeidyo3mosfyusgtdtakqsykwzf43d3p2kiqxwinr5bta6f3ygwvase
+  handlers.py: bafybeiazvfyfld6ajfsygoy6ahfg27h6hiyhd46ixculhwtz2jlhh3fioe
+  models.py: bafybeigjfnlhxok6aketpdqllasi763e6hkrr4u4jzvfhcbsbabcftwami
 fingerprint_ignore_patterns: []
 connections: []
 contracts: []
 protocols: []
 skills:
-- valory/abstract_round_abci:0.1.0:bafybeih3enhagoql7kzpeyzzu2scpkif6y3ubakpralfnwxcvxexdyvy5i
-- valory/registration_abci:0.1.0:bafybeiek7zcsxbucjwzgqfftafhfrocvc7q4yxllh2q44jeemsjxg3rcfm
-- valory/reset_pause_abci:0.1.0:bafybeidw4mbx3os3hmv7ley7b3g3gja7ydpitr7mxbjpwzxin2mzyt5yam
-- valory/termination_abci:0.1.0:bafybeicj5yw47w6le47tp2kvm22wfme4hxsvbegtfgx7ya3ipyswanwiwq
-- valory/send_api_data_abci:0.1.0:bafybeigfepuewfldd4sitrniixpaq2qd2tnwjkhalmgcmohcpfhe2lgyfi
-- valory/learning_abci:0.1.0:bafybeihfv3wk6b5u6ns25wrjo5ejoymkntsl3z6er5wh7mi2fs4lb4h4pi
-- valory/transaction_settlement_abci:0.1.0:bafybeigtzlk4uakmd54rxnznorcrstsr52kta474lgrnvx5ovr546vj7sq
+- valory/abstract_round_abci:0.1.0:bafybeigjrepaqpb3m7zunmt4hryos4vto4yyj3u6iyofdb2fotwho3bqvm
+- keyko/send_api_data_abci:0.1.0:bafybeihzeajyorw746ueerwl6b2rkmnxu444fgcy2hzjy2je6tfeljwbhy
+- keyko/peaq_abci:0.1.0:bafybeidifjteoei544lbk673hwsomnfjxd5u6e7dikf4ssn4oumex3lt34
 behaviours:
   main:
     args: {}
-    class_name: LearningChainedConsensusBehaviour
+    class_name: PeaqChainedConsensusBehaviour
 handlers:
   abci:
     args: {}
@@ -109,7 +104,7 @@ models:
       retry_attempts: 400
       retry_timeout: 3
       round_timeout_seconds: 30.0
-      service_id: learning
+      service_id: peaq
       service_registry_address: null
       setup:
         all_participants: []
@@ -135,19 +130,6 @@ models:
       tx_timeout: 10.0
       ipfs_address: https://gateway.autonolas.tech/ipfs/
       default_chain_id: gnosis
-      coingecko_price_template: https://api.coingecko.com/api/v3/simple/price?ids=autonolas&vs_currencies=usd&x_cg_demo_api_key={api_key}
-      coingecko_api_key: null
-      erc20_token_address: 0x
-      usbls_statement_page: https://www.bls.gov/news.release/cpi.nr0.htm
-      transfer_target_address: '0x0000000000000000000000000000000000000000'
-      fxstreet_api_url: https://calendar-api.fxstreet.com/en/api/v1/eventDates/
-      wxdai_contract_address: '0xe91D153E0b41518A2Ce8Dd3D7944Fa863463a97d'
-      wbtc_contract_address: '0x8e5bBbb09Ed1ebdE8674Cda39A0c169401db4252'
-      uniswap_router_address: '0x1C232F01118CB8B424793ae03F870aa7D0ac7f77'
-      deposit_tracker_address: '0x632ffD8A237C004Ea8f91d06547427B0410033DC'
-      multisend_contract_address: '0xA349a37dD7EaF03218c7321a87Bf6a2a13Eb86B5'
-      trade_amount: 10000000000000000000
-      slippage_tolerance: 0.01
       olas_api_url_project_data: http://192.168.100.61:8001/api/projects/data
       olas_api_url_agent_data: http://192.168.100.61:8001/api/agents/data
       olas_api_x_api_key: 57c622cf-3469-4181-b7f5-92053d75db9f

@@ -1,7 +1,11 @@
 {
     "dev": {
-        "skill/keyko/peaq_abci/0.1.0": "bafybeidngqk53zg7jd3orql5i23ozam7gt5d3pg2nrx5mb4gceupicqanu",
-        "agent/keyko/peaq_agent/0.1.0": "bafybeihg7t4crdbqtqkn3xlrxrnm77slkihig6cm3bdt653ttgf3ioun5i"
+        "custom/keyko/peaq_model/0.1.0": "bafybeigd5b2lyv3ik4jdbgph7thfk2lk273wqo7hore4navjmeb6mxc3mq",
+        "skill/keyko/peaq_abci/0.1.0": "bafybeidifjteoei544lbk673hwsomnfjxd5u6e7dikf4ssn4oumex3lt34",
+        "skill/keyko/learning_chained_abci/0.1.0": "bafybeiekb7ozmwtl7kndpv4zg7adwx2zqw7sujmjch4qij3b3zzhyp6w2i",
+        "skill/keyko/send_api_data_abci/0.1.0": "bafybeihzeajyorw746ueerwl6b2rkmnxu444fgcy2hzjy2je6tfeljwbhy",
+        "skill/keyko/peaq_chained_abci/0.1.0": "bafybeigh22c5hnb5mftudvhhceivd4muu52feqpowi5sd672sm7lgg453e",
+        "agent/keyko/peaq_agent/0.1.0": "bafybeigltqmajy5h7nmebrt5twqwid6lzqnhb4abj2uwqz22vmtfkxkq3i"
     },
     "third_party": {
         "protocol/open_aea/signing/1.0.0": "bafybeihv62fim3wl2bayavfcg3u5e5cxu3b7brtu4cn5xoxd6lqwachasi",
