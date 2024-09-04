@@ -1,11 +1,11 @@
 {
     "dev": {
         "custom/keyko/peaq_model/0.1.0": "bafybeigd5b2lyv3ik4jdbgph7thfk2lk273wqo7hore4navjmeb6mxc3mq",
-        "skill/keyko/peaq_abci/0.1.0": "bafybeifhkdqezrrp5lybqxzft2g476u42rgxsebrvrns3v2w4m64ddutmm",
+        "skill/keyko/peaq_abci/0.1.0": "bafybeihy4gi445iwyqadokfrphsgz2amwh5i3mvelvouvruovylutbf6bu",
         "skill/keyko/learning_chained_abci/0.1.0": "bafybeiekb7ozmwtl7kndpv4zg7adwx2zqw7sujmjch4qij3b3zzhyp6w2i",
         "skill/keyko/send_api_data_abci/0.1.0": "bafybeicrkuk3qpnhnbeswn7ebztisyyqn3rg3afon4bfnenholwqd3utkq",
-        "skill/keyko/peaq_chained_abci/0.1.0": "bafybeidx3tfsdn3hrxvkf5aajhwcm3pldudtfxjenvrbwswzg7kraozave",
-        "agent/keyko/peaq_agent/0.1.0": "bafybeihx3djtnrlphvlm3j74hdg6yrtygmzm3wbjpqpwkma4dnky22qkde"
+        "skill/keyko/peaq_chained_abci/0.1.0": "bafybeidyjdopn6uoe433u7scosiujsamjshti4xmpa6mzpueotg3boad6i",
+        "agent/keyko/peaq_agent/0.1.0": "bafybeidytnbdvhz6soty6u3znqlw5lvaffawfsrqiqnys7u5tr5m3nml3a"
     },
     "third_party": {
         "protocol/open_aea/signing/1.0.0": "bafybeihv62fim3wl2bayavfcg3u5e5cxu3b7brtu4cn5xoxd6lqwachasi",
@@ -23,6 +23,7 @@
         "connection/valory/ledger/0.19.0": "bafybeic3ft7l7ca3qgnderm4xupsfmyoihgi27ukotnz7b5hdczla2enya",
         "connection/valory/p2p_libp2p_client/0.1.0": "bafybeid3xg5k2ol5adflqloy75ibgljmol6xsvzvezebsg7oudxeeolz7e",
         "skill/valory/abstract_abci/0.1.0": "bafybeihljirk3d4rgvmx2nmz3p2mp27iwh2o5euce5gccwjwrpawyjzuaq",
-        "skill/valory/abstract_round_abci/0.1.0": "bafybeigjrepaqpb3m7zunmt4hryos4vto4yyj3u6iyofdb2fotwho3bqvm"
+        "skill/valory/abstract_round_abci/0.1.0": "bafybeigjrepaqpb3m7zunmt4hryos4vto4yyj3u6iyofdb2fotwho3bqvm",
+        "skill/valory/reset_pause_abci/0.1.0": "bafybeicm7onl72rfnn33pbvzwjpkl5gafeieyobfcnyresxz7kunjwmqea"
     }
 }

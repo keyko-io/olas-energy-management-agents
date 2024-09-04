@@ -37,15 +37,12 @@ from packages.keyko.skills.peaq_abci.rounds import (
     DeviceInteractionRound,
     QueryModelRound,
     RegistrationRound,
-    ResetAndPauseRound,
-    Event
 )
 from packages.keyko.skills.peaq_abci.rounds import (
     CollectDataPayload,
     DeviceInteractionPayload,
     QueryModelPayload,
     RegistrationPayload,
-    ResetAndPausePayload,
 )
 
 
@@ -265,28 +262,6 @@ class DeviceInteractionBehaviour(PeaqBaseBehaviour):
 
         return data
 
-
-class ResetAndPauseBehaviour(PeaqBaseBehaviour):
-    """ResetAndPauseBehaviour"""
-
-    matching_round: Type[AbstractRound] = ResetAndPauseRound
-
-    def async_act(self) -> Generator:
-        """Do the act, supporting asynchronous execution."""
-
-        with self.context.benchmark_tool.measure(self.behaviour_id).local():
-            self.context.logger.info(f"ResetAndPauseBehaviour: Reset and pause for {self.params.reset_pause_duration} seconds")
-            yield from self.sleep(self.params.reset_pause_duration)
-
-            sender = self.context.agent_address
-            payload = ResetAndPausePayload(sender=sender)
-
-        with self.context.benchmark_tool.measure(self.behaviour_id).consensus():
-            yield from self.send_a2a_transaction(payload)
-            yield from self.wait_until_round_end()
-
-        self.set_done()
-
 class PeaqRoundBehaviour(AbstractRoundBehaviour):
     """PeaqRoundBehaviour"""
 
@@ -297,5 +272,4 @@ class PeaqRoundBehaviour(AbstractRoundBehaviour):
         DeviceInteractionBehaviour,
         QueryModelBehaviour,
         RegistrationBehaviour,
-        ResetAndPauseBehaviour
     ]

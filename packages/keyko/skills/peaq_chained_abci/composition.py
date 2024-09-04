@@ -21,6 +21,7 @@
 
 import packages.keyko.skills.peaq_abci.rounds as PeaqAbci
 import packages.keyko.skills.send_api_data_abci.rounds as SendAPIDataAbci
+import packages.valory.skills.reset_pause_abci.rounds as ResetAndPauseAbci
 from packages.valory.skills.abstract_round_abci.abci_app_chain import (
     AbciAppTransitionMapping,
     chain,
@@ -28,13 +29,16 @@ from packages.valory.skills.abstract_round_abci.abci_app_chain import (
 
 abci_app_transition_mapping: AbciAppTransitionMapping = {
     PeaqAbci.FinishedRound: SendAPIDataAbci.ProjectDataSubmissionDecisionRound,
-    SendAPIDataAbci.FinishedAgentDataSubmissionRound: PeaqAbci.CollectDataRound,
+    SendAPIDataAbci.FinishedAgentDataSubmissionRound: ResetAndPauseAbci.ResetAndPauseRound,
+    ResetAndPauseAbci.FinishedResetAndPauseRound: PeaqAbci.CollectDataRound,
+    ResetAndPauseAbci.FinishedResetAndPauseErrorRound: PeaqAbci.RegistrationRound,
 }
 
 PeaqChainedSkillAbciApp = chain(
     (
         PeaqAbci.PeaqAbciApp,
         SendAPIDataAbci.SendAPIDataAbciApp,
+        ResetAndPauseAbci.ResetPauseAbciApp,
     ),
     abci_app_transition_mapping,
 )

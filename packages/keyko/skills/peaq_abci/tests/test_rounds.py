@@ -29,7 +29,6 @@ from packages.keyko.skills.peaq_abci.payloads import (
     DeviceInteractionPayload,
     QueryModelPayload,
     RegistrationPayload,
-    ResetAndPausePayload,
 )
 from packages.keyko.skills.peaq_abci.rounds import (
     AbstractRound,
@@ -39,7 +38,6 @@ from packages.keyko.skills.peaq_abci.rounds import (
     DeviceInteractionRound,
     QueryModelRound,
     RegistrationRound,
-    ResetAndPauseRound,
 )
 from packages.valory.skills.abstract_round_abci.base import (
     BaseTxPayload,
@@ -140,19 +138,6 @@ class TestRegistrationRound(BasePeaqRoundTest):
     """Tests for RegistrationRound."""
 
     round_class = RegistrationRound
-
-    # TODO: provide test cases
-    @pytest.mark.parametrize("test_case", [])
-    def test_run(self, test_case: RoundTestCase) -> None:
-        """Run tests."""
-
-        self.run_test(test_case)
-
-
-class TestResetAndPauseRound(BasePeaqRoundTest):
-    """Tests for ResetAndPauseRound."""
-
-    round_class = ResetAndPauseRound
 
     # TODO: provide test cases
     @pytest.mark.parametrize("test_case", [])

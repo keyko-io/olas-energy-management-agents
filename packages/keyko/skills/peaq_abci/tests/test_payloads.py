@@ -30,7 +30,6 @@ from packages.keyko.skills.peaq_abci.payloads import (
     DeviceInteractionPayload,
     QueryModelPayload,
     RegistrationPayload,
-    ResetAndPausePayload,
 )
 
 

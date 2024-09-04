@@ -39,7 +39,6 @@ from packages.keyko.skills.peaq_abci.payloads import (
     DeviceInteractionPayload,
     QueryModelPayload,
     RegistrationPayload,
-    ResetAndPausePayload,
 )
 
 class Event(Enum):
@@ -210,29 +209,6 @@ class DeviceInteractionRound(AbstractRound):
         self.payload_sent = True
         self.interaction_success = payload.success
 
-class ResetAndPauseRound(AbstractRound):
-    """ResetAndPauseRound"""
-
-    payload_class = ResetAndPausePayload
-    synchronized_data_class = SynchronizedData
-    payload_sent = False
-
-    def end_block(self) -> Optional[Tuple[BaseSynchronizedData, Enum]]:
-        """Process the end of the block."""
-        if not self.payload_sent:
-            return None
-        self.payload_sent = False
-        return self.synchronized_data, Event.DONE
-
-
-    def check_payload(self, payload: ResetAndPausePayload) -> None:
-        """Check payload."""
-        return
-
-    def process_payload(self, payload: ResetAndPausePayload) -> None:
-        """Process payload."""
-        self.payload_sent = True
-
 
 class FinishedRound(DegenerateRound):
     """FinishedRound"""
@@ -241,29 +217,24 @@ class PeaqAbciApp(AbciApp[Event]):
     """PeaqAbciApp"""
 
     initial_round_cls: AppState = RegistrationRound
-    initial_states: Set[AppState] = {RegistrationRound}
+    initial_states: Set[AppState] = {RegistrationRound, CollectDataRound}
     transition_function: AbciAppTransitionFunction = {
         CollectDataRound: {
             Event.DONE: QueryModelRound,
-            Event.NOT_ENOUGH_DATA: ResetAndPauseRound,
-            Event.ROUND_TIMEOUT: CollectDataRound
+            Event.NOT_ENOUGH_DATA: FinishedRound,
         },
         QueryModelRound: {
-            Event.NO_TRANSACT: ResetAndPauseRound,
+            Event.NO_TRANSACT: FinishedRound,
             Event.TRANSACT: DeviceInteractionRound,
-            Event.ERROR: ResetAndPauseRound
+            Event.ERROR: FinishedRound
         },
         FinishedRound: {},
-        ResetAndPauseRound: {
-            Event.DONE: FinishedRound,
-            Event.RESET_TIMEOUT: RegistrationRound
-        },
         RegistrationRound: {
             Event.DONE: CollectDataRound
         },
         DeviceInteractionRound: {
-            Event.DONE: ResetAndPauseRound,
-            Event.ERROR: ResetAndPauseRound
+            Event.DONE: FinishedRound,
+            Event.ERROR: FinishedRound
         }
     }
     final_states: Set[AppState] = {
@@ -275,7 +246,8 @@ class PeaqAbciApp(AbciApp[Event]):
     )
     db_pre_conditions: Dict[AppState, Set[str]] = {
         RegistrationRound: [],
+        CollectDataRound: [],
     }
     db_post_conditions: Dict[AppState, Set[str]] = {
-
+        FinishedRound: set(),
     }

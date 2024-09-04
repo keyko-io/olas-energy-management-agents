@@ -4,11 +4,12 @@ alphabet_in:
 - TRANSACT
 - NO_TRANSACT
 - ROUND_TIMEOUT
+- RESET_AND_PAUSE_TIMEOUT
 - RESET_TIMEOUT
 - ERROR
 default_start_state: RegistrationRound
 final_states: []
-label: PeaqAbciApp
+label: PeaqChainedSkillAbciApp
 start_states:
 - RegistrationRound
 states:
@@ -17,15 +18,19 @@ states:
 - DeviceInteractionRound
 - RegistrationRound
 - ResetAndPauseRound
+- FinishedRound
+- ProjectDataSubmissionDecisionRound
 transition_func:
     (CollectDataRound, DONE): QueryModelRound
-    (CollectDataRound, NOT_ENOUGH_DATA): ResetAndPauseRound
+    (CollectDataRound, NOT_ENOUGH_DATA): FinishedRound
     (CollectDataRound, ROUND_TIMEOUT): CollectDataRound
-    (QueryModelRound, NO_TRANSACT): ResetAndPauseRound
+    (QueryModelRound, NO_TRANSACT): FinishedRound
     (QueryModelRound, TRANSACT): DeviceInteractionRound
-    (QueryModelRound, ERROR): ResetAndPauseRound
-    (ResetAndPauseRound, DONE): CollectDataRound
-    (ResetAndPauseRound, RESET_TIMEOUT): ResetAndPauseRound
+    (QueryModelRound, ERROR): FinishedRound
+    (FinishedRound, DONE): ProjectDataSubmissionDecisionRound
+    (FinishedAgentDataSubmissionRound, DONE): ResetAndPauseRound
+    (ResetAndPauseRound, RESET_AND_PAUSE_TIMEOUT): RegistrationRound
+    (ResetAndPauseRound, RESET_TIMEOUT): CollectDataRound
     (RegistrationRound, DONE): CollectDataRound
-    (DeviceInteractionRound, DONE): ResetAndPauseRound
-    (DeviceInteractionRound, ERROR): ResetAndPauseRound
+    (DeviceInteractionRound, DONE): FinishedRound
+    (DeviceInteractionRound, ERROR): FinishedRound

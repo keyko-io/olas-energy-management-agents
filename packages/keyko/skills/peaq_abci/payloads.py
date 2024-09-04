@@ -45,7 +45,3 @@ class QueryModelPayload(BaseTxPayload):
     """Represent a transaction payload for the QueryModelRound."""
     prediction_class: int
 
-@dataclass(frozen=True)
-class ResetAndPausePayload(BaseTxPayload):
-    """Represent a transaction payload for the ResetAndPauseRound."""
-
