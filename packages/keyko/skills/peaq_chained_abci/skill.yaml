@@ -7,11 +7,11 @@ license: Apache-2.0
 aea_version: '>=1.0.0, <2.0.0'
 fingerprint:
   __init__.py: bafybeifnduerlt62gqt6bswu2jjggqbwovylj36t6yedwxvj7jlrsjjl2q
-  behaviours.py: bafybeie6pk2fhbhjyyzrq4bn5nojzktedzmycn2nxr6jxswzmlfbyispqy
-  composition.py: bafybeiber7y6jpqswcqscnactindlm2ovma7qnegt2rwnxqonut6mh5h6e
+  behaviours.py: bafybeibl55toas6uwrzwqkyo75gag4zjqhyueq2fmz62t74kscbcmzee3i
+  composition.py: bafybeifi3rzm2lemlnctoflifn3lu7x27rsedfwgczu2ncvaih5oa2lchu
   dialogues.py: bafybeiakqfqcpg7yrxt4bsyernhy5p77tci4qhmgqqjqi3ttx7zk6sklca
   handlers.py: bafybeiazvfyfld6ajfsygoy6ahfg27h6hiyhd46ixculhwtz2jlhh3fioe
-  models.py: bafybeig53r7bduiqldywichvvd4eennzv2vjrpq257omqweydsxa6ulbfm
+  models.py: bafybeidjohbh2yc4twt25krqkhb6dcrqgicntzy6msk7gewgnmgn2zwhce
 fingerprint_ignore_patterns: []
 connections: []
 contracts: []
@@ -19,7 +19,7 @@ protocols: []
 skills:
 - valory/abstract_round_abci:0.1.0:bafybeigjrepaqpb3m7zunmt4hryos4vto4yyj3u6iyofdb2fotwho3bqvm
 - keyko/send_api_data_abci:0.1.0:bafybeicrkuk3qpnhnbeswn7ebztisyyqn3rg3afon4bfnenholwqd3utkq
-- keyko/peaq_abci:0.1.0:bafybeihy4gi445iwyqadokfrphsgz2amwh5i3mvelvouvruovylutbf6bu
+- keyko/peaq_abci:0.1.0:bafybeiebj3ngus3yawlxsdkn2dpzg5he446tkvijho7fsgxn522e6tu6fe
 behaviours:
   main:
     args: {}

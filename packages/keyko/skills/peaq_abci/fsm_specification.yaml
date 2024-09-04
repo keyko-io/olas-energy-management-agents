@@ -9,8 +9,8 @@ final_states:
 - FinishedRound
 label: PeaqAbciApp
 start_states:
-- RegistrationRound
 - CollectDataRound
+- RegistrationRound
 states:
 - CollectDataRound
 - QueryModelRound
@@ -18,11 +18,11 @@ states:
 - RegistrationRound
 - FinishedRound
 transition_func:
+    (RegistrationRound, DONE): CollectDataRound
     (CollectDataRound, DONE): QueryModelRound
     (CollectDataRound, NOT_ENOUGH_DATA): FinishedRound
     (QueryModelRound, NO_TRANSACT): FinishedRound
     (QueryModelRound, TRANSACT): DeviceInteractionRound
     (QueryModelRound, ERROR): FinishedRound
-    (RegistrationRound, DONE): CollectDataRound
     (DeviceInteractionRound, DONE): FinishedRound
     (DeviceInteractionRound, ERROR): FinishedRound

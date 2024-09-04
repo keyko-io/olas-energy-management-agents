@@ -27,18 +27,28 @@ from packages.valory.skills.abstract_round_abci.behaviours import (
 )
 from packages.keyko.skills.peaq_abci.behaviours import (PeaqRoundBehaviour, RegistrationBehaviour)
 from packages.keyko.skills.send_api_data_abci.behaviours import SendAPIDataRoundBehaviour
-from packages.valory.skills.reset_pause_abci.behaviours import ResetPauseABCIConsensusBehaviour
 from packages.keyko.skills.peaq_chained_abci.composition import (
     PeaqChainedSkillAbciApp,
+)
+from packages.valory.skills.reset_pause_abci.behaviours import ResetPauseABCIConsensusBehaviour
+from packages.valory.skills.registration_abci.behaviours import (
+    AgentRegistrationRoundBehaviour,
+    RegistrationStartupBehaviour,
+)
+from packages.valory.skills.termination_abci.behaviours import (
+    BackgroundBehaviour,
+    TerminationAbciBehaviours,
 )
 
 class PeaqChainedConsensusBehaviour(AbstractRoundBehaviour):
     """Class to define the behaviours this AbciApp has."""
-
-    initial_behaviour_cls = RegistrationBehaviour
+    initial_behaviour_cls = RegistrationStartupBehaviour
     abci_app_cls = PeaqChainedSkillAbciApp
     behaviours: Set[Type[BaseBehaviour]] = {
+        *AgentRegistrationRoundBehaviour.behaviours,
         *PeaqRoundBehaviour.behaviours,
         *SendAPIDataRoundBehaviour.behaviours,
         *ResetPauseABCIConsensusBehaviour.behaviours,
+        *TerminationAbciBehaviours.behaviours,
     }
+    background_behaviours_cls = {BackgroundBehaviour}

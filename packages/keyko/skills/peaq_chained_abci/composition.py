@@ -21,18 +21,33 @@
 
 import packages.keyko.skills.peaq_abci.rounds as PeaqAbci
 import packages.keyko.skills.send_api_data_abci.rounds as SendAPIDataAbci
+import packages.valory.skills.registration_abci.rounds as RegistrationAbci
 import packages.valory.skills.reset_pause_abci.rounds as ResetAndPauseAbci
 from packages.valory.skills.abstract_round_abci.abci_app_chain import (
     AbciAppTransitionMapping,
     chain,
 )
+from packages.valory.skills.abstract_round_abci.base import BackgroundAppConfig
+from packages.valory.skills.termination_abci.rounds import (
+    BackgroundRound,
+    Event,
+    TerminationAbciApp,
+)
+
 
 abci_app_transition_mapping: AbciAppTransitionMapping = {
+    RegistrationAbci.FinishedRegistrationRound: PeaqAbci.RegistrationRound,
     PeaqAbci.FinishedRound: SendAPIDataAbci.ProjectDataSubmissionDecisionRound,
     SendAPIDataAbci.FinishedAgentDataSubmissionRound: ResetAndPauseAbci.ResetAndPauseRound,
     ResetAndPauseAbci.FinishedResetAndPauseRound: PeaqAbci.CollectDataRound,
     ResetAndPauseAbci.FinishedResetAndPauseErrorRound: PeaqAbci.RegistrationRound,
 }
+
+termination_config = BackgroundAppConfig(
+    round_cls=BackgroundRound,
+    start_event=Event.TERMINATE,
+    abci_app=TerminationAbciApp,
+)
 
 PeaqChainedSkillAbciApp = chain(
     (
@@ -41,4 +56,4 @@ PeaqChainedSkillAbciApp = chain(
         ResetAndPauseAbci.ResetPauseAbciApp,
     ),
     abci_app_transition_mapping,
-)
+).add_background_app(termination_config)
