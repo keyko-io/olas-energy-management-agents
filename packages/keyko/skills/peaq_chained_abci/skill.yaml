@@ -14,13 +14,15 @@ fingerprint:
   models.py: bafybeidjohbh2yc4twt25krqkhb6dcrqgicntzy6msk7gewgnmgn2zwhce
 fingerprint_ignore_patterns: []
 connections: []
-contracts: []
+contracts:
+- valory/multisend:0.1.0:bafybeiet3of7f5vvhyi5zy4mufeiae6vu5n2lyo27tqconny47tyrpkb2m
 protocols: []
 skills:
-- valory/abstract_round_abci:0.1.0:bafybeih3enhagoql7kzpeyzzu2scpkif6y3ubakpralfnwxcvxexdyvy5i
-- valory/registration_abci:0.1.0:bafybeiek7zcsxbucjwzgqfftafhfrocvc7q4yxllh2q44jeemsjxg3rcfm
-- valory/reset_pause_abci:0.1.0:bafybeidw4mbx3os3hmv7ley7b3g3gja7ydpitr7mxbjpwzxin2mzyt5yam
-- valory/termination_abci:0.1.0:bafybeicj5yw47w6le47tp2kvm22wfme4hxsvbegtfgx7ya3ipyswanwiwq
+- valory/abstract_round_abci:0.1.0:bafybeigjrepaqpb3m7zunmt4hryos4vto4yyj3u6iyofdb2fotwho3bqvm
+- valory/registration_abci:0.1.0:bafybeif3ln6eg53ebrfe6uicjew4uqp2ynyrcxkw5wi4jm3ixqv3ykte4a
+- valory/reset_pause_abci:0.1.0:bafybeicm7onl72rfnn33pbvzwjpkl5gafeieyobfcnyresxz7kunjwmqea
+- valory/transaction_settlement_abci:0.1.0:bafybeifmgbnstd7trsxr556zyv4xedm7yneptrqlkufj6ya7q5tclqioiq
+- valory/termination_abci:0.1.0:bafybeia5cd4eoptsftazplrp2mrsybfpqjhb2ph2qjhy2iwrxe2dieon44
 - keyko/send_api_data_abci:0.1.0:bafybeicrkuk3qpnhnbeswn7ebztisyyqn3rg3afon4bfnenholwqd3utkq
 - keyko/peaq_abci:0.1.0:bafybeiebj3ngus3yawlxsdkn2dpzg5he446tkvijho7fsgxn522e6tu6fe
 behaviours:
