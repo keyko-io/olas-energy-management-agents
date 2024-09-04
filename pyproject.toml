@@ -20,7 +20,7 @@ open-autonomy = "==0.14.6"
 typing_extensions = ">=3.10.0.2"
 toml = "==0.10.2"
 tomte = {version = "==0.2.15", extras = ["cli", "tests"]}
-open-aea-ledger-ethereum = "^1.48.0"
+open-aea-ledger-ethereum = "1.48.0"
 grpcio = "^1.65.4"
 py-ecc = "^7.0.1"
 pytz = "^2024.1"
