@@ -98,6 +98,11 @@ class ProjectDataSubmissionDecisionBehaviour(SendAPIDataBaseBehaviour):  # pylin
                 is_project_data_submitted=True,
                 history_slug_timestamp=history_slug_timestamp
             )
+            self.context.logger.info(
+                f"ProjectDataSubmissionDecisionBehaviour: Agent with address: {self.context.agent_address} has decided to submit the project data: {event}."
+            )
+            self.context.logger.info(f"payload: {payload}")
+            self.context.logger.info(f"Sync data: {self.synchronized_data}")
             
 
         with self.context.benchmark_tool.measure(self.behaviour_id).consensus():

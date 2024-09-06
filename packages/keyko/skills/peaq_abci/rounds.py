@@ -38,7 +38,7 @@ from packages.keyko.skills.peaq_abci.payloads import (
     CollectDataPayload,
     DeviceInteractionPayload,
     QueryModelPayload,
-    RegistrationPayload,
+    PrefillPayload,
 )
 
 class Event(Enum):
@@ -69,10 +69,10 @@ class SynchronizedData(BaseSynchronizedData):
         """Get the last prediction class."""
         return self.db.get("last_prediction_class", -1)
 
-class RegistrationRound(CollectSameUntilThresholdRound):
-    """RegistrationRound"""
+class PrefillRound(CollectSameUntilThresholdRound):
+    """PrefillRound"""
 
-    payload_class = RegistrationPayload
+    payload_class = PrefillPayload
     synchronized_data_class = SynchronizedData
     payload_sent = False
 
@@ -216,8 +216,8 @@ class FinishedRound(DegenerateRound):
 class PeaqAbciApp(AbciApp[Event]):
     """PeaqAbciApp"""
 
-    initial_round_cls: AppState = RegistrationRound
-    initial_states: Set[AppState] = {RegistrationRound, CollectDataRound}
+    initial_round_cls: AppState = PrefillRound
+    initial_states: Set[AppState] = {PrefillRound, CollectDataRound}
     transition_function: AbciAppTransitionFunction = {
         CollectDataRound: {
             Event.DONE: QueryModelRound,
@@ -229,7 +229,7 @@ class PeaqAbciApp(AbciApp[Event]):
             Event.ERROR: FinishedRound
         },
         FinishedRound: {},
-        RegistrationRound: {
+        PrefillRound: {
             Event.DONE: CollectDataRound
         },
         DeviceInteractionRound: {
@@ -245,8 +245,8 @@ class PeaqAbciApp(AbciApp[Event]):
         [get_name(SynchronizedData.prosumer_data)]
     )
     db_pre_conditions: Dict[AppState, Set[str]] = {
-        RegistrationRound: [],
-        CollectDataRound: [],
+        PrefillRound: set(),
+        CollectDataRound: set(),
     }
     db_post_conditions: Dict[AppState, Set[str]] = {
         FinishedRound: set(),

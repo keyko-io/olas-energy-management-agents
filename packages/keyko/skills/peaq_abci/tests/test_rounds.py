@@ -28,7 +28,7 @@ from packages.keyko.skills.peaq_abci.payloads import (
     CollectDataPayload,
     DeviceInteractionPayload,
     QueryModelPayload,
-    RegistrationPayload,
+    PrefillPayload,
 )
 from packages.keyko.skills.peaq_abci.rounds import (
     AbstractRound,
@@ -37,7 +37,7 @@ from packages.keyko.skills.peaq_abci.rounds import (
     CollectDataRound,
     DeviceInteractionRound,
     QueryModelRound,
-    RegistrationRound,
+    PrefillRound,
 )
 from packages.valory.skills.abstract_round_abci.base import (
     BaseTxPayload,
@@ -134,10 +134,10 @@ class TestQueryModelRound(BasePeaqRoundTest):
         self.run_test(test_case)
 
 
-class TestRegistrationRound(BasePeaqRoundTest):
-    """Tests for RegistrationRound."""
+class TestPrefillRound(BasePeaqRoundTest):
+    """Tests for PrefillRound."""
 
-    round_class = RegistrationRound
+    round_class = PrefillRound
 
     # TODO: provide test cases
     @pytest.mark.parametrize("test_case", [])

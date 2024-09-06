@@ -34,13 +34,12 @@ from packages.valory.skills.termination_abci.rounds import (
     TerminationAbciApp,
 )
 
-
 abci_app_transition_mapping: AbciAppTransitionMapping = {
-    RegistrationAbci.FinishedRegistrationRound: PeaqAbci.RegistrationRound,
+    RegistrationAbci.FinishedRegistrationRound: PeaqAbci.PrefillRound,
     PeaqAbci.FinishedRound: SendAPIDataAbci.ProjectDataSubmissionDecisionRound,
     SendAPIDataAbci.FinishedAgentDataSubmissionRound: ResetAndPauseAbci.ResetAndPauseRound,
     ResetAndPauseAbci.FinishedResetAndPauseRound: PeaqAbci.CollectDataRound,
-    ResetAndPauseAbci.FinishedResetAndPauseErrorRound: PeaqAbci.RegistrationRound,
+    ResetAndPauseAbci.FinishedResetAndPauseErrorRound: PeaqAbci.PrefillRound,
 }
 
 termination_config = BackgroundAppConfig(
@@ -51,6 +50,7 @@ termination_config = BackgroundAppConfig(
 
 PeaqChainedSkillAbciApp = chain(
     (
+        RegistrationAbci.AgentRegistrationAbciApp,
         PeaqAbci.PeaqAbciApp,
         SendAPIDataAbci.SendAPIDataAbciApp,
         ResetAndPauseAbci.ResetPauseAbciApp,

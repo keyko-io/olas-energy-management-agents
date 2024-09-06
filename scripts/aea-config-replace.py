@@ -59,6 +59,7 @@ def main() -> None:
                 "address"
             ] = f"${{str:{os.getenv('GNOSIS_LEDGER_RPC')}}}"
 
+
     with open(Path("peaq_agent", "aea-config.yaml"), "w", encoding="utf-8") as file:
         yaml.dump_all(config, file, sort_keys=False)
 

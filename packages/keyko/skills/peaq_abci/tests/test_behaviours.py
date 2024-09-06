@@ -37,7 +37,7 @@ from packages.keyko.skills.peaq_abci.behaviours import (
     CollectDataBehaviour,
     DeviceInteractionBehaviour,
     QueryModelBehaviour,
-    RegistrationBehaviour,
+    PrefillBehaviour,
 )
 from packages.keyko.skills.peaq_abci.rounds import (
     SynchronizedData,
@@ -47,7 +47,7 @@ from packages.keyko.skills.peaq_abci.rounds import (
     CollectDataRound,
     DeviceInteractionRound,
     QueryModelRound,
-    RegistrationRound,
+    PrefillRound,
 )
 
 from packages.valory.skills.abstract_round_abci.test_tools.base import (
@@ -157,11 +157,11 @@ class TestQueryModelBehaviour(BasePeaqTest):
         self.complete(test_case.event)
 
 
-class TestRegistrationBehaviour(BasePeaqTest):
-    """Tests RegistrationBehaviour"""
+class TestPrefillBehaviour(BasePeaqTest):
+    """Tests PrefillBehaviour"""
 
     # TODO: set next_behaviour_class
-    behaviour_class: Type[BaseBehaviour] = RegistrationBehaviour
+    behaviour_class: Type[BaseBehaviour] = PrefillBehaviour
     next_behaviour_class: Type[BaseBehaviour] = ...
 
     # TODO: provide test cases

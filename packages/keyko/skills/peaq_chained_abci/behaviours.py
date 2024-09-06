@@ -25,7 +25,7 @@ from packages.valory.skills.abstract_round_abci.behaviours import (
     AbstractRoundBehaviour,
     BaseBehaviour,
 )
-from packages.keyko.skills.peaq_abci.behaviours import (PeaqRoundBehaviour, RegistrationBehaviour)
+from packages.keyko.skills.peaq_abci.behaviours import PeaqRoundBehaviour
 from packages.keyko.skills.send_api_data_abci.behaviours import SendAPIDataRoundBehaviour
 from packages.keyko.skills.peaq_chained_abci.composition import (
     PeaqChainedSkillAbciApp,

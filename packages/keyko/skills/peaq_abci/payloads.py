@@ -25,8 +25,8 @@ from packages.valory.skills.abstract_round_abci.base import BaseTxPayload
 
 
 @dataclass(frozen=True)
-class RegistrationPayload(BaseTxPayload):
-    """Represent a transaction payload for the RegistrationRound."""
+class PrefillPayload(BaseTxPayload):
+    """Represent a transaction payload for the PrefillRound."""
     prosumer_data: list
 
 @dataclass(frozen=True)

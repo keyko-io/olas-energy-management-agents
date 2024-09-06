@@ -7,26 +7,26 @@ license: Apache-2.0
 aea_version: '>=1.0.0, <2.0.0'
 fingerprint:
   __init__.py: bafybeibppyaanwerv6xr5dxhaidvjmxvx3frkmhtbeldaouceytn6kltpu
-  behaviours.py: bafybeiarapgunmi2d7gvxr3al43upyaxa3zelep26c2il7svpgbu2bnj4y
+  behaviours.py: bafybeig2gpbhnrusejzhybd47jwlmrqchnzfr44yksvmauc3uxpbu6e45y
   dialogues.py: bafybeicko5ws4fdwndjoog5a6hzbmozcc3wmeb3yeqpmamv4d6nuqc5beu
-  fsm_specification.yaml: bafybeiak4ftsoik3wgxvosjfyj6jaibc2g2n4qycic2akcgghvdzhw2equ
-  handlers.py: bafybeih6l3xjs2zro2tq4add6xsszwf3efket6sohsuzjygiqblqbga7om
+  fsm_specification.yaml: bafybeih76pm2txzrpdmvteyvupuyy4fzhvwkjb5apmwzlnyo5ad7brd6ue
+  handlers.py: bafybeig66ehy7rmz2xele6om64jykxrdtd6xrz4eim56yj25e45uxu4zgy
   models.py: bafybeibytzcndszfnok5d5kutt2jujgkxrn4ryvetgjruwz463gre3yjoe
-  payloads.py: bafybeihqv2czubys4algrgefdppnnv4dxrrb42brsyg2uyfom3o7e6giuy
-  rounds.py: bafybeid347bzdldtp56lqsdpwm523muszbq2544cidt2iyshdhlhvxe7b4
+  payloads.py: bafybeibb4xg6wokdbv6rsvw4ea5gdkdbpddglma3rcoe3k422ce6h67f7e
+  rounds.py: bafybeig43j6nsb226yimtvilpye2ipbjkpaub7fgky54gw7zytn2d5gcuy
   tests/__init__.py: bafybeifigp64li3j3yidpan5arc27etm3jytadjsckjaidrem57hst73ry
-  tests/test_behaviours.py: bafybeiarrz5n7nwbfgt5whnyz2ao6k7gt47tlbszqu6yjvvy7srmurxjhm
+  tests/test_behaviours.py: bafybeigiqmrekouan3zibnxnm5v4ynthdbfqkfp7yo3av74fh6s6h6ssxi
   tests/test_dialogues.py: bafybeihrg3vsvnditsus75hq2inaara4zsekdfrtnltwrg6ktbo7jdvvju
   tests/test_handlers.py: bafybeidppwia5stmun6g7a7mbgwlhqf6ikw7o54i5xnfhbxhglr4y4s7lu
   tests/test_models.py: bafybeich4ittjyj7u54mqww5whe4bj4gyabrls457uufco7sr62ubwo2jy
   tests/test_payloads.py: bafybeifsc6pcbuixcq7pyfyhtn3dcdnbt3afesd4psogjzu2r3bvvmukwu
-  tests/test_rounds.py: bafybeia4mk6zaz3mi6jrxu6is5wo4lyxdr73emxwzaw6p4i3yoeymoeaza
+  tests/test_rounds.py: bafybeiekirb47js6ktvzf4dwrz6znj77xxtf3iniqd7vqzwepmompejceu
 fingerprint_ignore_patterns: []
 connections: []
 contracts: []
 protocols: []
 skills:
-- valory/abstract_round_abci:0.1.0:bafybeigjrepaqpb3m7zunmt4hryos4vto4yyj3u6iyofdb2fotwho3bqvm
+- valory/abstract_round_abci:0.1.0:bafybeiglgj6bygexoupnwbd5avc4q5izf5tmzryi34ebp5yxelf2ba7gsu
 behaviours:
   main:
     args: {}
@@ -153,5 +153,5 @@ models:
     args: {}
     class_name: TendermintDialogues
 dependencies: {}
-is_abstract: false
+is_abstract: true
 customs: []

@@ -1,10 +1,10 @@
 {
     "dev": {
         "custom/keyko/peaq_model/0.1.0": "bafybeigd5b2lyv3ik4jdbgph7thfk2lk273wqo7hore4navjmeb6mxc3mq",
-        "skill/keyko/peaq_abci/0.1.0": "bafybeiebj3ngus3yawlxsdkn2dpzg5he446tkvijho7fsgxn522e6tu6fe",
-        "skill/keyko/send_api_data_abci/0.1.0": "bafybeicrkuk3qpnhnbeswn7ebztisyyqn3rg3afon4bfnenholwqd3utkq",
-        "skill/keyko/peaq_chained_abci/0.1.0": "bafybeidg3xc5xc5mirl74v3apj4k2llgifdftmicby3sfaxz74urigtnku",
-        "agent/keyko/peaq_agent/0.1.0": "bafybeib62t74yovjqnh4tv2ofic75umhogva33vncg7dlrhms7nxxr3siy"
+        "skill/keyko/peaq_abci/0.1.0": "bafybeiatpkkm4fs4po3ibnik3pk2qzgpqcudo5wi323s6idozp3xj6442y",
+        "skill/keyko/send_api_data_abci/0.1.0": "bafybeiac7gkap4yb5kmvkh6j7xoez4u6q4zi7s55padmbpuqg4ijsieegi",
+        "skill/keyko/peaq_chained_abci/0.1.0": "bafybeif77dlvqhyo4fek6premrztd7g3vkyclzn7amgd3fwot3t46npmmu",
+        "agent/keyko/peaq_agent/0.1.0": "bafybeicynsfyhv2vmw3fbkrksqhu64btbq5vydcorzemf7xas567i2yuuq"
     },
     "third_party": {
         "protocol/open_aea/signing/1.0.0": "bafybeihv62fim3wl2bayavfcg3u5e5cxu3b7brtu4cn5xoxd6lqwachasi",
@@ -16,19 +16,19 @@
         "protocol/valory/ledger_api/1.0.0": "bafybeihdk6psr4guxmbcrc26jr2cbgzpd5aljkqvpwo64bvaz7tdti2oni",
         "protocol/valory/tendermint/0.1.0": "bafybeig4mi3vmlv5zpbjbfuzcgida6j5f2nhrpedxicmrrfjweqc5r7cra",
         "contract/valory/service_registry/0.1.0": "bafybeiby5x4wfdywlenmoudbykdxohpq2nifqxfep5niqgxrjyrekyahzy",
-        "contract/valory/gnosis_safe/0.1.0": "bafybeibq77mgzhyb23blf2eqmia3kc6io5karedfzhntvpcebeqdzrgyqa",
-        "contract/valory/gnosis_safe_proxy_factory/0.1.0": "bafybeib6podeifufgmawvicm3xyz3uaplbcrsptjzz4unpseh7qtcpar74",
-        "contract/valory/multisend/0.1.0": "bafybeiet3of7f5vvhyi5zy4mufeiae6vu5n2lyo27tqconny47tyrpkb2m",
+        "contract/valory/gnosis_safe/0.1.0": "bafybeictjc7saviboxbsdcey3trvokrgo7uoh76mcrxecxhlvcrp47aqg4",
+        "contract/valory/gnosis_safe_proxy_factory/0.1.0": "bafybeie6ynnoavvk2fpbn426nlp32sxrj7pz5esgebtlezy4tmx5gjretm",
+        "contract/valory/multisend/0.1.0": "bafybeig5byt5urg2d2bsecufxe5ql7f4mezg3mekfleeh32nmuusx66p4y",
         "connection/valory/abci/0.1.0": "bafybeifbnhe4f2bll3a5o3hqji3dqx4soov7hr266rdz5vunxgzo5hggbq",
-        "connection/valory/http_client/0.23.0": "bafybeih5vzo22p2umhqo52nzluaanxx7kejvvpcpdsrdymckkyvmsim6gm",
+        "connection/valory/http_client/0.23.0": "bafybeihi772xgzpqeipp3fhmvpct4y6e6tpjp4sogwqrnf3wqspgeilg4u",
         "connection/valory/ipfs/0.1.0": "bafybeiflaxrnepfn4hcnq5pieuc7ki7d422y3iqb54lv4tpgs7oywnuhhq",
-        "connection/valory/ledger/0.19.0": "bafybeic3ft7l7ca3qgnderm4xupsfmyoihgi27ukotnz7b5hdczla2enya",
+        "connection/valory/ledger/0.19.0": "bafybeihynkdraqthjtv74qk3nc5r2xubniqx2hhzpxn7bd4qmlf7q4wruq",
         "connection/valory/p2p_libp2p_client/0.1.0": "bafybeid3xg5k2ol5adflqloy75ibgljmol6xsvzvezebsg7oudxeeolz7e",
         "skill/valory/abstract_abci/0.1.0": "bafybeihljirk3d4rgvmx2nmz3p2mp27iwh2o5euce5gccwjwrpawyjzuaq",
-        "skill/valory/abstract_round_abci/0.1.0": "bafybeigjrepaqpb3m7zunmt4hryos4vto4yyj3u6iyofdb2fotwho3bqvm",
-        "skill/valory/reset_pause_abci/0.1.0": "bafybeicm7onl72rfnn33pbvzwjpkl5gafeieyobfcnyresxz7kunjwmqea",
-        "skill/valory/termination_abci/0.1.0": "bafybeia5cd4eoptsftazplrp2mrsybfpqjhb2ph2qjhy2iwrxe2dieon44",
-        "skill/valory/registration_abci/0.1.0": "bafybeif3ln6eg53ebrfe6uicjew4uqp2ynyrcxkw5wi4jm3ixqv3ykte4a",
-        "skill/valory/transaction_settlement_abci/0.1.0": "bafybeifmgbnstd7trsxr556zyv4xedm7yneptrqlkufj6ya7q5tclqioiq"
+        "skill/valory/reset_pause_abci/0.1.0": "bafybeifkxpmlxn3wjuleokn6ty7fnvsogshuxp45ihtbqqwi7g4p2ybyki",
+        "skill/valory/termination_abci/0.1.0": "bafybeiggxjbcbarj7cpeuxacll7nlqxf3klj4ytpdvkmj6z67dqohyy3ae",
+        "skill/valory/registration_abci/0.1.0": "bafybeiheei5s4rtktdz4ygqeelpcl6rah5jnruhlzjviwspvrvhvdq76w4",
+        "skill/valory/transaction_settlement_abci/0.1.0": "bafybeignwmyqfp6pwjxtsgr6jj3vreiqwrx25lgc26ztgz2mroalsq2laa",
+        "skill/valory/abstract_round_abci/0.1.0": "bafybeiglgj6bygexoupnwbd5avc4q5izf5tmzryi34ebp5yxelf2ba7gsu"
     }
 }

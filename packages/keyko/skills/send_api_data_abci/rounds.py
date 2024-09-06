@@ -87,6 +87,9 @@ class ProjectDataSubmissionDecisionRound(CollectSameUntilThresholdRound):
     def end_block(self) -> Optional[Tuple[BaseSynchronizedData, SendApiDataEvent]]:
         """Process the end of the block."""
 
+        print("-----------------")
+        print(synchronized_data)
+        print("-----------------")
         if self.threshold_reached:
             synchronized_data = self.synchronized_data.update(
                 is_project_data_submitted=self.most_voted_payload_values[1],

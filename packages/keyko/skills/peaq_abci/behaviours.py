@@ -36,13 +36,13 @@ from packages.keyko.skills.peaq_abci.rounds import (
     CollectDataRound,
     DeviceInteractionRound,
     QueryModelRound,
-    RegistrationRound,
+    PrefillRound,
 )
 from packages.keyko.skills.peaq_abci.rounds import (
     CollectDataPayload,
     DeviceInteractionPayload,
     QueryModelPayload,
-    RegistrationPayload,
+    PrefillPayload,
 )
 
 
@@ -59,10 +59,10 @@ class PeaqBaseBehaviour(BaseBehaviour, ABC):
         """Return the params."""
         return cast(Params, super().params)
 
-class RegistrationBehaviour(PeaqBaseBehaviour):
-    """RegistrationBehaviour"""
+class PrefillBehaviour(PeaqBaseBehaviour):
+    """PrefillBehaviour"""
 
-    matching_round: Type[AbstractRound] = RegistrationRound
+    matching_round: Type[AbstractRound] = PrefillRound
 
     # TODO: implement logic required to set payload content for synchronization
     def async_act(self) -> Generator:
@@ -72,11 +72,11 @@ class RegistrationBehaviour(PeaqBaseBehaviour):
         with self.context.benchmark_tool.measure(self.behaviour_id).local():
             if self.params.prefill_data:
                 energy_data = yield from self.get_combinder_past_data()
-                self.context.logger.info(f"RegistrationBehaviour: For testing purposes, we'll prefill the prosumer data with last 60 minutes from CSV")
+                self.context.logger.info(f"PrefillBehaviour: For testing purposes, we'll prefill the prosumer data with last 60 minutes from CSV")
             else:
                 energy_data = []
             sender = self.context.agent_address
-            payload = RegistrationPayload(sender=sender, prosumer_data=energy_data)
+            payload = PrefillPayload(sender=sender, prosumer_data=energy_data)
 
         with self.context.benchmark_tool.measure(self.behaviour_id).consensus():
             yield from self.send_a2a_transaction(payload)
@@ -133,6 +133,11 @@ class CollectDataBehaviour(PeaqBaseBehaviour):
         """
         Get the data from Combinder API which contains the power production and consumption data.
         """
+        return {
+            "grid_import": 0,
+            "pv": 0,
+            "cet_cest_timestamp": "2024-01-01T00:00:00Z"
+        }
         url = self.params.combinder_api_url + f"/energy-data"
         response = yield from self.get_http_response(
             method="GET",
@@ -265,11 +270,11 @@ class DeviceInteractionBehaviour(PeaqBaseBehaviour):
 class PeaqRoundBehaviour(AbstractRoundBehaviour):
     """PeaqRoundBehaviour"""
 
-    initial_behaviour_cls = RegistrationBehaviour
+    initial_behaviour_cls = PrefillBehaviour
     abci_app_cls = PeaqAbciApp  # type: ignore
     behaviours: Set[Type[BaseBehaviour]] = [
         CollectDataBehaviour,
         DeviceInteractionBehaviour,
         QueryModelBehaviour,
-        RegistrationBehaviour,
+        PrefillBehaviour,
     ]

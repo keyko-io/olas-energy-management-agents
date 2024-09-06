@@ -8,12 +8,12 @@ fingerprint: {}
 fingerprint_ignore_patterns: []
 connections:
 - valory/abci:0.1.0:bafybeifbnhe4f2bll3a5o3hqji3dqx4soov7hr266rdz5vunxgzo5hggbq
-- valory/http_client:0.23.0:bafybeih5vzo22p2umhqo52nzluaanxx7kejvvpcpdsrdymckkyvmsim6gm
+- valory/http_client:0.23.0:bafybeihi772xgzpqeipp3fhmvpct4y6e6tpjp4sogwqrnf3wqspgeilg4u
 - valory/ipfs:0.1.0:bafybeiflaxrnepfn4hcnq5pieuc7ki7d422y3iqb54lv4tpgs7oywnuhhq
-- valory/ledger:0.19.0:bafybeic3ft7l7ca3qgnderm4xupsfmyoihgi27ukotnz7b5hdczla2enya
+- valory/ledger:0.19.0:bafybeihynkdraqthjtv74qk3nc5r2xubniqx2hhzpxn7bd4qmlf7q4wruq
 - valory/p2p_libp2p_client:0.1.0:bafybeid3xg5k2ol5adflqloy75ibgljmol6xsvzvezebsg7oudxeeolz7e
 contracts:
-- valory/multisend:0.1.0:bafybeiet3of7f5vvhyi5zy4mufeiae6vu5n2lyo27tqconny47tyrpkb2m
+- valory/multisend:0.1.0:bafybeig5byt5urg2d2bsecufxe5ql7f4mezg3mekfleeh32nmuusx66p4y
 protocols:
 - open_aea/signing:1.0.0:bafybeihv62fim3wl2bayavfcg3u5e5cxu3b7brtu4cn5xoxd6lqwachasi
 - valory/abci:0.1.0:bafybeiaqmp7kocbfdboksayeqhkbrynvlfzsx4uy4x6nohywnmaig4an7u
@@ -21,14 +21,14 @@ protocols:
 - valory/ipfs:0.1.0:bafybeiftxi2qhreewgsc5wevogi7yc5g6hbcbo4uiuaibauhv3nhfcdtvm
 skills:
 - valory/abstract_abci:0.1.0:bafybeihljirk3d4rgvmx2nmz3p2mp27iwh2o5euce5gccwjwrpawyjzuaq
-- valory/abstract_round_abci:0.1.0:bafybeigjrepaqpb3m7zunmt4hryos4vto4yyj3u6iyofdb2fotwho3bqvm
-- valory/termination_abci:0.1.0:bafybeia5cd4eoptsftazplrp2mrsybfpqjhb2ph2qjhy2iwrxe2dieon44
-- valory/registration_abci:0.1.0:bafybeif3ln6eg53ebrfe6uicjew4uqp2ynyrcxkw5wi4jm3ixqv3ykte4a
-- valory/reset_pause_abci:0.1.0:bafybeicm7onl72rfnn33pbvzwjpkl5gafeieyobfcnyresxz7kunjwmqea
-- valory/transaction_settlement_abci:0.1.0:bafybeifmgbnstd7trsxr556zyv4xedm7yneptrqlkufj6ya7q5tclqioiq
-- keyko/peaq_abci:0.1.0:bafybeiebj3ngus3yawlxsdkn2dpzg5he446tkvijho7fsgxn522e6tu6fe
-- keyko/peaq_chained_abci:0.1.0:bafybeidg3xc5xc5mirl74v3apj4k2llgifdftmicby3sfaxz74urigtnku
-- keyko/send_api_data_abci:0.1.0:bafybeicrkuk3qpnhnbeswn7ebztisyyqn3rg3afon4bfnenholwqd3utkq
+- valory/abstract_round_abci:0.1.0:bafybeiglgj6bygexoupnwbd5avc4q5izf5tmzryi34ebp5yxelf2ba7gsu
+- valory/termination_abci:0.1.0:bafybeiggxjbcbarj7cpeuxacll7nlqxf3klj4ytpdvkmj6z67dqohyy3ae
+- valory/registration_abci:0.1.0:bafybeiheei5s4rtktdz4ygqeelpcl6rah5jnruhlzjviwspvrvhvdq76w4
+- valory/reset_pause_abci:0.1.0:bafybeifkxpmlxn3wjuleokn6ty7fnvsogshuxp45ihtbqqwi7g4p2ybyki
+- valory/transaction_settlement_abci:0.1.0:bafybeignwmyqfp6pwjxtsgr6jj3vreiqwrx25lgc26ztgz2mroalsq2laa
+- keyko/peaq_abci:0.1.0:bafybeiatpkkm4fs4po3ibnik3pk2qzgpqcudo5wi323s6idozp3xj6442y
+- keyko/peaq_chained_abci:0.1.0:bafybeif77dlvqhyo4fek6premrztd7g3vkyclzn7amgd3fwot3t46npmmu
+- keyko/send_api_data_abci:0.1.0:bafybeiac7gkap4yb5kmvkh6j7xoez4u6q4zi7s55padmbpuqg4ijsieegi
 default_ledger: ethereum
 required_ledgers:
 - ethereum
@@ -64,6 +64,28 @@ dependencies:
     version: ==0.12.1.post1
 default_connection: null
 ---
+public_id: keyko/peaq_chained_abci:0.1.0
+type: skill
+models:
+  params:
+    args:
+      setup:
+        all_participants: ${list:["0xf558A1fE24B5aA052D10CdC47Da684e6Cd63B975"]}
+      tendermint_url: ${str:http://localhost:26657}
+      tendermint_com_url: ${str:http://localhost:8080}
+      slash_cooldown_hours: ${int:3}
+      slash_threshold_amount: ${int:10000000000000000}
+      light_slash_unit_amount: ${int:5000000000000000}
+      serious_slash_unit_amount: ${int:8000000000000000}
+      use_termination: ${bool:false}
+      use_slashing: ${bool:false}
+      reset_pause_duration: ${int:60}
+      number_of_data_points: ${int:60}
+      combinder_api_url: ${str:http://localhost:8080}
+      model_api_url: ${str:http://localhost:8080}
+      device_id: ${str:123456}
+      prefill_data: ${bool:false}
+---
 public_id: keyko/peaq_abci:0.1.0
 type: skill
 models:
@@ -97,7 +119,7 @@ models:
 public_id: valory/abci:0.1.0
 type: connection
 config:
-  target_skill_id: keyko/peaq_abci:0.1.0
+  target_skill_id: keyko/peaq_chained_abci:0.1.0
   host: ${str:localhost}
   port: ${int:26658}
   use_tendermint: ${bool:false}
