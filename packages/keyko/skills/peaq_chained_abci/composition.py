@@ -35,11 +35,11 @@ from packages.valory.skills.termination_abci.rounds import (
 )
 
 abci_app_transition_mapping: AbciAppTransitionMapping = {
-    RegistrationAbci.FinishedRegistrationRound: PeaqAbci.PrefillRound,
+    RegistrationAbci.FinishedRegistrationRound: PeaqAbci.CollectDataRound,
     PeaqAbci.FinishedRound: SendAPIDataAbci.ProjectDataSubmissionDecisionRound,
     SendAPIDataAbci.FinishedAgentDataSubmissionRound: ResetAndPauseAbci.ResetAndPauseRound,
     ResetAndPauseAbci.FinishedResetAndPauseRound: PeaqAbci.CollectDataRound,
-    ResetAndPauseAbci.FinishedResetAndPauseErrorRound: PeaqAbci.PrefillRound,
+    ResetAndPauseAbci.FinishedResetAndPauseErrorRound: PeaqAbci.CollectDataRound,
 }
 
 termination_config = BackgroundAppConfig(

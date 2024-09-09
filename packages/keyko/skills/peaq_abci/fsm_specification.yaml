@@ -4,21 +4,18 @@ alphabet_in:
 - TRANSACT
 - NO_TRANSACT
 - ERROR
-default_start_state: PrefillRound
+default_start_state: CollectDataRound
 final_states: 
 - FinishedRound
 label: PeaqAbciApp
 start_states:
 - CollectDataRound
-- PrefillRound
 states:
 - CollectDataRound
 - QueryModelRound
 - DeviceInteractionRound
-- PrefillRound
 - FinishedRound
 transition_func:
-    (PrefillRound, DONE): CollectDataRound
     (CollectDataRound, DONE): QueryModelRound
     (CollectDataRound, NOT_ENOUGH_DATA): FinishedRound
     (QueryModelRound, NO_TRANSACT): FinishedRound

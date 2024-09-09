@@ -13,7 +13,7 @@ fingerprint:
   handlers.py: bafybeiaorn5eawzy6r2xgyhzjzdvuvruyy7hnxmpacr4mhh5rkzqimbhpy
   models.py: bafybeialnanzd2vp65xzrpqghqwoarnlu523uhjkklw3aafsylz27u56dq
   payloads.py: bafybeicnzigzo2ncvp2ky3md7rnp5jzhqrqo6j5qhha6rwio5jxvw5sdvy
-  rounds.py: bafybeicgu3dknjzgrileptk6bje6tutnjmhz2ct4apoznkngintpfghn7y
+  rounds.py: bafybeic5q3o5caafi7fepvfo735lkqag77yoasbae76cnrlop77n2fk22e
 fingerprint_ignore_patterns: []
 connections: []
 contracts: []
@@ -52,7 +52,7 @@ models:
     class_name: AbciDialogues
   benchmark_tool:
     args:
-      log_dir: /logs
+      log_dir: ./logs
     class_name: BenchmarkTool
   contract_api_dialogues:
     args: {}

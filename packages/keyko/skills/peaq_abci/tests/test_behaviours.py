@@ -27,9 +27,7 @@ import pytest
 
 from packages.valory.skills.abstract_round_abci.base import AbciAppDB
 from packages.valory.skills.abstract_round_abci.behaviours import (
-    AbstractRoundBehaviour,
     BaseBehaviour,
-    make_degenerate_behaviour,
 )
 from packages.keyko.skills.peaq_abci.behaviours import (
     PeaqBaseBehaviour,
@@ -37,17 +35,10 @@ from packages.keyko.skills.peaq_abci.behaviours import (
     CollectDataBehaviour,
     DeviceInteractionBehaviour,
     QueryModelBehaviour,
-    PrefillBehaviour,
 )
 from packages.keyko.skills.peaq_abci.rounds import (
     SynchronizedData,
-    DegenerateRound,
     Event,
-    PeaqAbciApp,
-    CollectDataRound,
-    DeviceInteractionRound,
-    QueryModelRound,
-    PrefillRound,
 )
 
 from packages.valory.skills.abstract_round_abci.test_tools.base import (
@@ -156,20 +147,3 @@ class TestQueryModelBehaviour(BasePeaqTest):
         # self.mock_ ...
         self.complete(test_case.event)
 
-
-class TestPrefillBehaviour(BasePeaqTest):
-    """Tests PrefillBehaviour"""
-
-    # TODO: set next_behaviour_class
-    behaviour_class: Type[BaseBehaviour] = PrefillBehaviour
-    next_behaviour_class: Type[BaseBehaviour] = ...
-
-    # TODO: provide test cases
-    @pytest.mark.parametrize("test_case", [])
-    def test_run(self, test_case: BehaviourTestCase) -> None:
-        """Run tests."""
-
-        self.fast_forward(test_case.initial_data)
-        # TODO: mock the necessary calls
-        # self.mock_ ...
-        self.complete(test_case.event)

@@ -24,12 +24,6 @@ from dataclasses import dataclass, field
 
 import pytest
 
-from packages.keyko.skills.peaq_abci.payloads import (
-    CollectDataPayload,
-    DeviceInteractionPayload,
-    QueryModelPayload,
-    PrefillPayload,
-)
 from packages.keyko.skills.peaq_abci.rounds import (
     AbstractRound,
     Event,
@@ -37,16 +31,12 @@ from packages.keyko.skills.peaq_abci.rounds import (
     CollectDataRound,
     DeviceInteractionRound,
     QueryModelRound,
-    PrefillRound,
 )
 from packages.valory.skills.abstract_round_abci.base import (
     BaseTxPayload,
 )
 from packages.valory.skills.abstract_round_abci.test_tools.rounds import (
     BaseRoundTestClass,
-    BaseOnlyKeeperSendsRoundTest,
-    BaseCollectDifferentUntilThresholdRoundTest,
-    BaseCollectSameUntilThresholdRoundTest,
  )
 
 
@@ -125,19 +115,6 @@ class TestQueryModelRound(BasePeaqRoundTest):
     """Tests for QueryModelRound."""
 
     round_class = QueryModelRound
-
-    # TODO: provide test cases
-    @pytest.mark.parametrize("test_case", [])
-    def test_run(self, test_case: RoundTestCase) -> None:
-        """Run tests."""
-
-        self.run_test(test_case)
-
-
-class TestPrefillRound(BasePeaqRoundTest):
-    """Tests for PrefillRound."""
-
-    round_class = PrefillRound
 
     # TODO: provide test cases
     @pytest.mark.parametrize("test_case", [])

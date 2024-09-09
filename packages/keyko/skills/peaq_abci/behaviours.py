@@ -36,13 +36,11 @@ from packages.keyko.skills.peaq_abci.rounds import (
     CollectDataRound,
     DeviceInteractionRound,
     QueryModelRound,
-    PrefillRound,
 )
 from packages.keyko.skills.peaq_abci.rounds import (
     CollectDataPayload,
     DeviceInteractionPayload,
     QueryModelPayload,
-    PrefillPayload,
 )
 
 
@@ -59,24 +57,31 @@ class PeaqBaseBehaviour(BaseBehaviour, ABC):
         """Return the params."""
         return cast(Params, super().params)
 
-class PrefillBehaviour(PeaqBaseBehaviour):
-    """PrefillBehaviour"""
+class CollectDataBehaviour(PeaqBaseBehaviour):
+    """CollectDataBehaviour"""
 
-    matching_round: Type[AbstractRound] = PrefillRound
+    matching_round: Type[AbstractRound] = CollectDataRound
 
-    # TODO: implement logic required to set payload content for synchronization
     def async_act(self) -> Generator:
         """Do the act, supporting asynchronous execution."""
-        # Step 0: Mock prosumer data
 
         with self.context.benchmark_tool.measure(self.behaviour_id).local():
-            if self.params.prefill_data:
-                energy_data = yield from self.get_combinder_past_data()
-                self.context.logger.info(f"PrefillBehaviour: For testing purposes, we'll prefill the prosumer data with last 60 minutes from CSV")
-            else:
-                energy_data = []
+            solar_data = yield from self.get_combinder_past_data(self.params.solar_device_id)
+            consumption_data = yield from self.get_combinder_past_data(self.params.ac_device_id)
+
+            combined_data = [
+                {
+                    'cet_cest_timestamp': solar[0], 
+                    'pv': solar[1] if solar[1] is not None else 0.0, 
+                    'grid_import': consumption[1] if consumption[1] is not None else 0.0
+                }
+                for solar, consumption in zip(solar_data, consumption_data)
+            ]
+
+
             sender = self.context.agent_address
-            payload = PrefillPayload(sender=sender, prosumer_data=energy_data)
+            self.context.logger.info(f"CollectDataBehaviour: Combined data: {combined_data}")
+            payload = CollectDataPayload(sender=sender, prosumer_data=combined_data)
 
         with self.context.benchmark_tool.measure(self.behaviour_id).consensus():
             yield from self.send_a2a_transaction(payload)
@@ -84,11 +89,11 @@ class PrefillBehaviour(PeaqBaseBehaviour):
 
         self.set_done()
 
-    def get_combinder_past_data(self) -> Generator[None, None, str]:
+    def get_combinder_past_data(self, device_id) -> Generator[None, None, str]:
         """
         Get the data from Combinder API which contains the power production and consumption data.
         """
-        url = self.params.combinder_api_url + f"/past-data"
+        url = f"{self.params.combinder_api_url}/devices/{device_id}/last_60min"
         response = yield from self.get_http_response(
             method="GET",
             url=url,
@@ -104,63 +109,9 @@ class PrefillBehaviour(PeaqBaseBehaviour):
             self.context.logger.error(f"APICheckBehaviour: Response headers: {response.headers}")
             return ""
         
-        data = json.loads(response.body)
+        data = json.loads(response.body)['result']
         
         return data
-
-class CollectDataBehaviour(PeaqBaseBehaviour):
-    """CollectDataBehaviour"""
-
-    matching_round: Type[AbstractRound] = CollectDataRound
-
-    def async_act(self) -> Generator:
-        """Do the act, supporting asynchronous execution."""
-
-        with self.context.benchmark_tool.measure(self.behaviour_id).local():
-            energy_data = yield from self.get_combinder_data()
-            self.context.logger.info(f"CollectDataBehaviour: Fetching data from Combinder API: {energy_data}")
-
-            sender = self.context.agent_address
-            payload = CollectDataPayload(sender=sender, prosumer_data=energy_data)
-
-        with self.context.benchmark_tool.measure(self.behaviour_id).consensus():
-            yield from self.send_a2a_transaction(payload)
-            yield from self.wait_until_round_end()
-
-        self.set_done()
-    
-    def get_combinder_data(self) -> Generator[None, None, str]:
-        """
-        Get the data from Combinder API which contains the power production and consumption data.
-        """
-        return {
-            "grid_import": 0,
-            "pv": 0,
-            "cet_cest_timestamp": "2024-01-01T00:00:00Z"
-        }
-        url = self.params.combinder_api_url + f"/energy-data"
-        response = yield from self.get_http_response(
-            method="GET",
-            url=url,
-            headers={"Authorization": f"Bearer {self.params.combinder_api_key}"}
-        )
-        if response.status_code != 200:
-            self.context.logger.error(
-                f"APICheckBehaviour: url: {url}"
-                f"APICheckBehaviour: Could not retrieve data from Combinder API. "
-                f"APICheckBehaviour: Received status code {response.status_code}."
-            )
-            self.context.logger.error(f"APICheckBehaviour: Response body: {response.body}")
-            self.context.logger.error(f"APICheckBehaviour: Response headers: {response.headers}")
-            return None
-        
-        data = json.loads(response.body)
-        
-        return {
-            "grid_import": data["grid_import"],
-            "pv": data["pv"],
-            "cet_cest_timestamp": data["cet_cest_timestamp"]
-        }
 
 class QueryModelBehaviour(PeaqBaseBehaviour):
     """QueryModelBehaviour"""
@@ -224,7 +175,7 @@ class DeviceInteractionBehaviour(PeaqBaseBehaviour):
 
         with self.context.benchmark_tool.measure(self.behaviour_id).local():
             device_action = bool(self.synchronized_data.last_prediction_class)
-            ret = yield from self.control_device(self.params.device_id, device_action)
+            ret = yield from self.control_device(self.params.ac_device_id, device_action)
             self.context.logger.info(f"DeviceInteractionBehaviour: Device control response: {ret}")
 
             sender = self.context.agent_address
@@ -238,7 +189,7 @@ class DeviceInteractionBehaviour(PeaqBaseBehaviour):
         
     def control_device(self, device_id, device_action):
         # Control the device based on the prediction
-        url = self.params.combinder_api_url + f"/device/control"
+        url = f"{self.params.combinder_api_url}/devices/{device_id}"
         response = yield from self.get_http_response(
             method="POST",
             url=url,
@@ -247,8 +198,7 @@ class DeviceInteractionBehaviour(PeaqBaseBehaviour):
                 "Content-Type": "application/json"
             },
             content=json.dumps({
-                "device_id": device_id,
-                "action": int(device_action)
+                "on": bool(device_action)
             }).encode('utf-8')
         )
         if response.status_code != 200:
@@ -270,11 +220,10 @@ class DeviceInteractionBehaviour(PeaqBaseBehaviour):
 class PeaqRoundBehaviour(AbstractRoundBehaviour):
     """PeaqRoundBehaviour"""
 
-    initial_behaviour_cls = PrefillBehaviour
+    initial_behaviour_cls = CollectDataBehaviour
     abci_app_cls = PeaqAbciApp  # type: ignore
     behaviours: Set[Type[BaseBehaviour]] = [
         CollectDataBehaviour,
         DeviceInteractionBehaviour,
         QueryModelBehaviour,
-        PrefillBehaviour,
     ]

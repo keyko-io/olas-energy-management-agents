@@ -44,9 +44,12 @@ def main() -> None:
 
         if os.getenv("MODEL_API_KEY"):
             config[1]["models"]["params"]["args"]["model_api_key"] = f"${{str:{os.getenv('MODEL_API_KEY')}}}"
-
-        if os.getenv("PREFILL_DATA"):
-            config[1]["models"]["params"]["args"]["prefill_data"] = f"${{bool:{os.getenv('PREFILL_DATA')}}}"
+        
+        if os.getenv("COMBINDER_SOLAR_DEVICE_ID"):
+            config[1]["models"]["params"]["args"]["solar_device_id"] = f"${{str:{os.getenv('COMBINDER_SOLAR_DEVICE_ID')}}}"
+        
+        if os.getenv("COMBINDER_AC_DEVICE_ID"):
+            config[1]["models"]["params"]["args"]["ac_device_id"] = f"${{str:{os.getenv('COMBINDER_AC_DEVICE_ID')}}}"
 
         # Ledger RPCs
         if os.getenv("ETHEREUM_LEDGER_RPC"):

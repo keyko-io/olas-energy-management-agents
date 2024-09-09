@@ -8,7 +8,7 @@ aea_version: '>=1.0.0, <2.0.0'
 fingerprint:
   __init__.py: bafybeifnduerlt62gqt6bswu2jjggqbwovylj36t6yedwxvj7jlrsjjl2q
   behaviours.py: bafybeic3ct32jlv72t2gnivmby774iq3ejgcyblkn2efw7afyffgeevv6m
-  composition.py: bafybeifwvm4v2i6wdqq3f2by2oldn7mvf7hu4zx5wjhxwju7hbhgppobaq
+  composition.py: bafybeihokcoujxwazv2u5bjfshoa2eirukpukoyybadzyuw5cjhqcjyqcm
   dialogues.py: bafybeiakqfqcpg7yrxt4bsyernhy5p77tci4qhmgqqjqi3ttx7zk6sklca
   handlers.py: bafybeiazvfyfld6ajfsygoy6ahfg27h6hiyhd46ixculhwtz2jlhh3fioe
   models.py: bafybeidjohbh2yc4twt25krqkhb6dcrqgicntzy6msk7gewgnmgn2zwhce
@@ -21,8 +21,8 @@ skills:
 - valory/registration_abci:0.1.0:bafybeiheei5s4rtktdz4ygqeelpcl6rah5jnruhlzjviwspvrvhvdq76w4
 - valory/reset_pause_abci:0.1.0:bafybeifkxpmlxn3wjuleokn6ty7fnvsogshuxp45ihtbqqwi7g4p2ybyki
 - valory/termination_abci:0.1.0:bafybeiggxjbcbarj7cpeuxacll7nlqxf3klj4ytpdvkmj6z67dqohyy3ae
-- keyko/send_api_data_abci:0.1.0:bafybeiac7gkap4yb5kmvkh6j7xoez4u6q4zi7s55padmbpuqg4ijsieegi
-- keyko/peaq_abci:0.1.0:bafybeiatpkkm4fs4po3ibnik3pk2qzgpqcudo5wi323s6idozp3xj6442y
+- keyko/send_api_data_abci:0.1.0:bafybeif4nayrqynis754s2zlzcdj3mwvocc4tbz3k4nkgzylqxugj4ajp4
+- keyko/peaq_abci:0.1.0:bafybeia2xvavd725tginnswho7nigegmkhzqhzdrjs7wezny4r7txrg7ce
 behaviours:
   main:
     args: {}
@@ -55,7 +55,7 @@ models:
     class_name: AbciDialogues
   benchmark_tool:
     args:
-      log_dir: /logs
+      log_dir: ./logs
     class_name: BenchmarkTool
   contract_api_dialogues:
     args: {}
@@ -141,9 +141,9 @@ models:
       model_api_url: http://localhost:8080
       combinder_api_key: null
       model_api_key: null
-      prefill_data: false
       number_of_data_points: 60
-      device_id: '123456'
+      solar_device_id: '123456'
+      ac_device_id: '123456'
       project_db_data:
         project:
           name: CPI

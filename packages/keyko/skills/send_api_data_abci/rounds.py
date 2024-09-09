@@ -87,9 +87,6 @@ class ProjectDataSubmissionDecisionRound(CollectSameUntilThresholdRound):
     def end_block(self) -> Optional[Tuple[BaseSynchronizedData, SendApiDataEvent]]:
         """Process the end of the block."""
 
-        print("-----------------")
-        print(synchronized_data)
-        print("-----------------")
         if self.threshold_reached:
             synchronized_data = self.synchronized_data.update(
                 is_project_data_submitted=self.most_voted_payload_values[1],
@@ -116,7 +113,7 @@ class ProjectDataSubmissionRound(CollectSameUntilAllRound):
         """Process the end of the block."""
         if self.collection_threshold_reached:
             synchronized_data = self.synchronized_data.update(
-                participants=tuple(sorted(self.collection)),
+                #participants=tuple(sorted(self.collection)),
                 synchronized_data_class=SynchronizedData,
             )
             return synchronized_data, SendApiDataEvent.DONE
@@ -133,7 +130,7 @@ class AgentDataSubmissionRound(CollectSameUntilAllRound):
         """Process the end of the block."""
         if self.collection_threshold_reached:
             synchronized_data = self.synchronized_data.update(
-                participants=tuple(sorted(self.collection)),
+                #participants=tuple(sorted(self.collection)),
                 synchronized_data_class=SynchronizedData,
             )
             return synchronized_data, SendApiDataEvent.DONE

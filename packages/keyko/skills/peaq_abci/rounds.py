@@ -38,7 +38,6 @@ from packages.keyko.skills.peaq_abci.payloads import (
     CollectDataPayload,
     DeviceInteractionPayload,
     QueryModelPayload,
-    PrefillPayload,
 )
 
 class Event(Enum):
@@ -69,35 +68,6 @@ class SynchronizedData(BaseSynchronizedData):
         """Get the last prediction class."""
         return self.db.get("last_prediction_class", -1)
 
-class PrefillRound(CollectSameUntilThresholdRound):
-    """PrefillRound"""
-
-    payload_class = PrefillPayload
-    synchronized_data_class = SynchronizedData
-    payload_sent = False
-
-    def end_block(self) -> Optional[Tuple[BaseSynchronizedData, Enum]]:
-        """Process the end of the block."""
-
-        if not self.payload_sent:
-            return None
-        
-        return self.synchronized_data, Event.DONE
-
-    def check_payload(self, payload: CollectDataPayload) -> None:
-        """Check payload."""
-        return
-
-    def process_payload(self, payload: CollectDataPayload) -> None:
-        """Process payload."""
-        self.synchronized_data.update(
-            participants=tuple(sorted(self.collection)),
-            prosumer_data=payload.prosumer_data[-59:],
-            synchronized_data_class=SynchronizedData,
-        )
-        self.payload_sent = True
-        return
-
 class CollectDataRound(CollectSameUntilThresholdRound):
     """CollectDataRound"""
 
@@ -111,6 +81,7 @@ class CollectDataRound(CollectSameUntilThresholdRound):
             return None
         
         self.payload_sent = False
+        self.context.logger.info(f"Prosumer data length: {len(self.synchronized_data.prosumer_data)}")
         
         if len(self.synchronized_data.prosumer_data) >= 60:
             return self.synchronized_data, Event.DONE
@@ -123,16 +94,13 @@ class CollectDataRound(CollectSameUntilThresholdRound):
 
     def process_payload(self, payload: CollectDataPayload) -> None:
         """Process payload."""
-        prosumer_data = self.synchronized_data.prosumer_data
         if payload.prosumer_data is not None:
-            prosumer_data.append(payload.prosumer_data)
-        self.synchronized_data.update(
-            prosumer_data=prosumer_data[-60:],
-            synchronized_data_class=SynchronizedData,
-        )
+            self.synchronized_data.update(
+                prosumer_data=payload.prosumer_data[-60:],
+                synchronized_data_class=SynchronizedData,
+            )
         self.payload_sent = True
         return
-
 
 class QueryModelRound(AbstractRound):
     """QueryModelRound"""
@@ -168,7 +136,7 @@ class QueryModelRound(AbstractRound):
         if payload.prediction_class == -1:
             self.err = True
             return
-        
+
         last_prediction_class = self.synchronized_data.last_prediction_class
         if payload.prediction_class == last_prediction_class:
             return
@@ -199,7 +167,6 @@ class DeviceInteractionRound(AbstractRound):
         
         return self.synchronized_data, Event.ERROR
 
-
     def check_payload(self, payload: DeviceInteractionPayload) -> None:
         """Check payload."""
         return
@@ -209,15 +176,14 @@ class DeviceInteractionRound(AbstractRound):
         self.payload_sent = True
         self.interaction_success = payload.success
 
-
 class FinishedRound(DegenerateRound):
     """FinishedRound"""
 
 class PeaqAbciApp(AbciApp[Event]):
     """PeaqAbciApp"""
 
-    initial_round_cls: AppState = PrefillRound
-    initial_states: Set[AppState] = {PrefillRound, CollectDataRound}
+    initial_round_cls: AppState = CollectDataRound
+    initial_states: Set[AppState] = {CollectDataRound}
     transition_function: AbciAppTransitionFunction = {
         CollectDataRound: {
             Event.DONE: QueryModelRound,
@@ -229,9 +195,6 @@ class PeaqAbciApp(AbciApp[Event]):
             Event.ERROR: FinishedRound
         },
         FinishedRound: {},
-        PrefillRound: {
-            Event.DONE: CollectDataRound
-        },
         DeviceInteractionRound: {
             Event.DONE: FinishedRound,
             Event.ERROR: FinishedRound
@@ -245,7 +208,6 @@ class PeaqAbciApp(AbciApp[Event]):
         [get_name(SynchronizedData.prosumer_data)]
     )
     db_pre_conditions: Dict[AppState, Set[str]] = {
-        PrefillRound: set(),
         CollectDataRound: set(),
     }
     db_post_conditions: Dict[AppState, Set[str]] = {
