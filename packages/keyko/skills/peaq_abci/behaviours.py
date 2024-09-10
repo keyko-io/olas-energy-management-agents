@@ -22,6 +22,8 @@
 from abc import ABC
 from typing import Generator, Set, Type, cast
 import json
+from datetime import datetime
+import urllib
 
 from packages.valory.skills.abstract_round_abci.base import AbstractRound
 from packages.valory.skills.abstract_round_abci.behaviours import (
@@ -71,7 +73,7 @@ class CollectDataBehaviour(PeaqBaseBehaviour):
 
             combined_data = [
                 {
-                    'cet_cest_timestamp': solar[0], 
+                    'cet_cest_timestamp': self.convert_timestamp(solar[0]), 
                     'pv': solar[1] if solar[1] is not None else 0.0, 
                     'grid_import': consumption[1] if consumption[1] is not None else 0.0
                 }
@@ -112,6 +114,12 @@ class CollectDataBehaviour(PeaqBaseBehaviour):
         data = json.loads(response.body)['result']
         
         return data
+    
+    def convert_timestamp(self, timestamp):
+        # Parsear el timestamp incluyendo la zona horaria
+        dt = datetime.fromisoformat(timestamp)
+        # Retornar el timestamp en el formato deseado
+        return dt.strftime('%Y-%m-%d %H:%M:%S')
 
 class QueryModelBehaviour(PeaqBaseBehaviour):
     """QueryModelBehaviour"""
@@ -176,10 +184,13 @@ class DeviceInteractionBehaviour(PeaqBaseBehaviour):
         with self.context.benchmark_tool.measure(self.behaviour_id).local():
             device_action = bool(self.synchronized_data.last_prediction_class)
             ret = yield from self.control_device(self.params.ac_device_id, device_action)
-            self.context.logger.info(f"DeviceInteractionBehaviour: Device control response: {ret}")
 
             sender = self.context.agent_address
-            payload = DeviceInteractionPayload(sender=sender, success=ret["success"], message=ret["message"])
+            # If ret["result"] is {} then the device was controlled successfully
+            success = True if ret["result"] == {} else False
+            message = ret["message"] if "success" in ret and ret["success"] == False else "Device controlled successfully."
+
+            payload = DeviceInteractionPayload(sender=sender, success=success, message=message)
 
         with self.context.benchmark_tool.measure(self.behaviour_id).consensus():
             yield from self.send_a2a_transaction(payload)
@@ -189,16 +200,16 @@ class DeviceInteractionBehaviour(PeaqBaseBehaviour):
         
     def control_device(self, device_id, device_action):
         # Control the device based on the prediction
-        url = f"{self.params.combinder_api_url}/devices/{device_id}"
+        url = f"{self.params.combinder_api_url}/devices/{device_id}/switch"
         response = yield from self.get_http_response(
             method="POST",
             url=url,
             headers={
                 "Authorization": f"Bearer {self.params.combinder_api_key}",
-                "Content-Type": "application/json"
+                "Content-Type": "application/x-www-form-urlencoded"
             },
-            content=json.dumps({
-                "on": bool(device_action)
+            content=urllib.parse.urlencode({
+                "on": "true" if device_action else "false"
             }).encode('utf-8')
         )
         if response.status_code != 200:
