@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 # Remove previous agent if exists
 if test -d peaq_agent; then
   echo "Removing previous agent build"

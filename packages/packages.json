@@ -3,8 +3,8 @@
         "custom/keyko/peaq_model/0.1.0": "bafybeigd5b2lyv3ik4jdbgph7thfk2lk273wqo7hore4navjmeb6mxc3mq",
         "skill/keyko/peaq_abci/0.1.0": "bafybeih5h5xefraypf4klj2des7yma7bkdkpgir6xvhwz7g73brojq2evm",
         "skill/keyko/send_api_data_abci/0.1.0": "bafybeif4nayrqynis754s2zlzcdj3mwvocc4tbz3k4nkgzylqxugj4ajp4",
-        "skill/keyko/peaq_chained_abci/0.1.0": "bafybeig2rz4g3bjcmj75v44rh3cphm4ehlx55eogcyg2csqmzupwvk7ale",
-        "agent/keyko/peaq_agent/0.1.0": "bafybeiduu6g7vkxx7v3yrz7qjwdmtu6krt55lqansst3wyuorxz46kyaf4"
+        "skill/keyko/peaq_chained_abci/0.1.0": "bafybeiguwnsjecdww6q422gbyui5q2tk4m7rkf72pdfhyldbxbi666brce",
+        "agent/keyko/peaq_agent/0.1.0": "bafybeibgwlnkyl45osjaahd3yfasakmv4hryt2jmaihrpftikh4esr7eke"
     },
     "third_party": {
         "protocol/open_aea/signing/1.0.0": "bafybeihv62fim3wl2bayavfcg3u5e5cxu3b7brtu4cn5xoxd6lqwachasi",
