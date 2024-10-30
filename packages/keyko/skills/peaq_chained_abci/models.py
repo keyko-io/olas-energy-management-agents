@@ -29,10 +29,8 @@ from packages.valory.skills.abstract_round_abci.tests.data.dummy_abci.models imp
 from packages.keyko.skills.peaq_abci.models import SharedState as BaseSharedState
 from packages.keyko.skills.peaq_abci.models import Params as PeaqParams
 from packages.keyko.skills.peaq_abci.rounds import Event as PeaqEvent
-from packages.keyko.skills.send_api_data_abci.models import SendAPIDataParams
 from packages.valory.skills.reset_pause_abci.rounds import Event as ResetPauseEvent
 from packages.valory.skills.termination_abci.models import TerminationParams
-from packages.keyko.skills.send_api_data_abci.rounds import SendApiDataEvent
 from packages.keyko.skills.peaq_chained_abci.composition import (
     PeaqChainedSkillAbciApp,
 )
@@ -67,15 +65,10 @@ class SharedState(BaseSharedState):
         PeaqChainedSkillAbciApp.event_to_timeout[PeaqEvent.ROUND_TIMEOUT] = (
             self.context.params.round_timeout_seconds * MULTIPLIER
         )
-        
-        PeaqChainedSkillAbciApp.event_to_timeout[SendApiDataEvent.ROUND_TIMEOUT] = (
-            self.context.params.round_timeout_seconds * MULTIPLIER
-        )
 
 
 class Params(  # pylint: disable=too-many-ancestors
     TerminationParams,
     PeaqParams,
-    SendAPIDataParams,
 ):
     """A model to represent params for multiple abci apps."""

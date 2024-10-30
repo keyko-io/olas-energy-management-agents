@@ -45,6 +45,9 @@ def main() -> None:
         if os.getenv("MODEL_API_KEY"):
             config[1]["models"]["params"]["args"]["model_api_key"] = f"${{str:{os.getenv('MODEL_API_KEY')}}}"
         
+        if os.getenv("MODEL_ID"):
+            config[1]["models"]["params"]["args"]["model_id"] = f"${{str:{os.getenv('model_id')}}}"
+        
         if os.getenv("COMBINDER_SOLAR_DEVICE_ID"):
             config[1]["models"]["params"]["args"]["solar_device_id"] = f"${{str:{os.getenv('COMBINDER_SOLAR_DEVICE_ID')}}}"
         

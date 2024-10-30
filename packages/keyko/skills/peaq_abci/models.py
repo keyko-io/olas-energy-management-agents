@@ -50,7 +50,10 @@ class Params(BaseParams):
         self.combinder_api_url = kwargs.get("combinder_api_url", None)
         self.model_api_url = kwargs.get("model_api_url", None)
         self.combinder_api_key = kwargs.get("combinder_api_key", None)
+        self.model_id = kwargs.get("model_id", 6)
         self.model_api_key = kwargs.get("model_api_key", None)
+        self.temperature = kwargs.get("temperature", None)
+        self.max_tokens = kwargs.get("max_tokens", None)
         self.solar_device_id = kwargs.get("solar_device_id", None)
         self.ac_device_id = kwargs.get("ac_device_id", None)
 

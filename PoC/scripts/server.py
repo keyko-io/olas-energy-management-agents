@@ -1,6 +1,3 @@
-import sys
-sys.path.append('..')
-
 from flask import Flask, jsonify, request, send_from_directory
 import pandas as pd
 import torch
@@ -11,29 +8,57 @@ from datetime import datetime, timedelta
 from dateutil import tz
 from utils.transformers import TransformerModel
 from functools import wraps
+import onnxruntime as ort
+
+
 
 app = Flask(__name__)
-DATA_FILE = '../data/residential4_features.csv'
-MODEL_FILE = '../models/transformer_model.pth'
-SCALER_FILE = '../models/scaler.pkl'
+DATA_FILE = 'data/residential4_features.csv'
+MODEL_FILE = 'models/transformer_model.pth'
+SCALER_FILE = 'models/scaler.pkl'
+ONNX_MODEL_FILE = 'models/transformer_model.onnx'
+device = torch.device("cpu")
 
-model = TransformerModel(
-    seq_length=60,
-    input_dim=5,  # 2 features (pv, grid_import) + 3 (hour, day_of_year, day_of_week)
-    head_size=256,
-    num_heads=4,
-    ff_dim=4,
-    num_transformer_blocks=4,
-    mlp_units=[128],
-    dropout=0.1,
-    mlp_dropout=0.1
-)
+# model = TransformerModel(
+#     seq_length=60,
+#     input_dim=5,  # 2 features (pv, grid_import) + 3 (hour, day_of_year, day_of_week)
+#     head_size=256,
+#     num_heads=4,
+#     ff_dim=4,
+#     num_transformer_blocks=4,
+#     mlp_units=[128],
+#     dropout=0.1,
+#     mlp_dropout=0.1
+# )
 
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+# model.load_state_dict(torch.load(MODEL_FILE, map_location=device))
+# model.to(device)
+# model.eval()  # Set model to evaluation mode
 
-model.load_state_dict(torch.load(MODEL_FILE, map_location=device))
-model.to(device)
-model.eval()  # Set model to evaluation mode
+# # Define el nombre del archivo ONNX
+
+# # Define un tensor de entrada de ejemplo, asegurándote de que tenga la misma forma que los datos de entrada que usas para el modelo
+# example_input = torch.randn(1, 60, 5)  # 1 batch size, 60 sequence length, 5 features
+
+# # Exportar el modelo a formato ONNX
+# torch.onnx.export(
+#     model,                          # El modelo PyTorch
+#     example_input,                  # El tensor de entrada de ejemplo
+#     ONNX_MODEL_FILE,                # Ruta donde se guardará el archivo ONNX
+#     export_params=True,             # Exportar también los parámetros del modelo
+#     opset_version=13,               # Versión de ONNX a usar (puedes ajustar esto según lo que necesites)
+#     input_names=['energy_features'], # Nombre de entrada descriptivo
+#     output_names=['prediction_output'], # Nombre de salida descriptivo
+#     dynamic_axes={
+#         'energy_features': {0: 'batch_size', 1: 'seq_length'},  # Tamaño de lote y longitud de secuencia como dimensiones dinámicas
+#         'prediction_output': {0: 'batch_size'}  # Salida dinámica en función del tamaño del lote
+#     }
+# )
+
+# print(f"Modelo exportado a ONNX y guardado en {ONNX_MODEL_FILE}")
+
+# Cargar el modelo ONNX utilizando ONNX Runtime
+onnx_session = ort.InferenceSession(ONNX_MODEL_FILE)
 
 scaler = joblib.load(SCALER_FILE)
 
@@ -62,7 +87,9 @@ def preprocess_data_from_api(data_list):
     :param data_list: List of dictionaries containing pv, grid_import, and cet_cest_timestamp.
     :return: A torch tensor ready for the model.
     """
-    # Extract values from the list of dictionaries
+    if not isinstance(data_list, list) or not all(isinstance(item, dict) for item in data_list):
+        raise ValueError("Input must be a list of dictionaries containing the required fields.")
+
     pv_values = []
     grid_import_values = []
     hours = []
@@ -77,16 +104,16 @@ def preprocess_data_from_api(data_list):
         day_of_years.append(timestamp.timetuple().tm_yday)
         day_of_weeks.append(timestamp.weekday())
 
-    # Convert to numpy array
+    # Create the feature array
     features = np.array([grid_import_values, pv_values, hours, day_of_years, day_of_weeks]).T
 
     # Normalize the features
     features_normalized = scaler.transform(features)
 
-    # Convert to torch tensor
-    features_tensor = torch.tensor(features_normalized, dtype=torch.float32).unsqueeze(0).to(device)  # Add batch dimension
-
-    return features_tensor
+    # Convert to a NumPy array and add the batch dimension
+    features_array = np.expand_dims(features_normalized, axis=0).astype(np.float32)  # Shape will be (1, 60, 5)
+    
+    return features_array
 
 def load_real_time_data(file_path: str) -> pd.DataFrame:
     """
@@ -108,10 +135,17 @@ def make_prediction(model, processed_data):
     :param processed_data: Preprocessed data as a torch tensor.
     :return: Prediction result.
     """
-    with torch.no_grad():
-        processed_data = processed_data.to(device)
-        prediction = model(processed_data)
-        return prediction.squeeze().item()
+    # Ensure the input data has the correct shape (batch_size, seq_length, num_features)
+    if processed_data.ndim != 3:
+        raise ValueError(f"Expected input to be 3-dimensional, but got shape {processed_data.shape}")
+
+    # Run the model inference
+    input_name = model.get_inputs()[0].name
+    output_name = model.get_outputs()[0].name
+    
+    prediction = model.run([output_name], {input_name: processed_data})
+    
+    return prediction[0].squeeze()
     
 @app.route('/schema.json')
 def serve_json():
@@ -126,7 +160,7 @@ def predict_energy():
     :return: JSON response with the prediction result.
     """
     try:
-        data = request.json["data"]
+        data = request.json["user_input"]["data"]
         
         # Verify that the data has exactly 60 data points
         if len(data) != 60:
@@ -136,7 +170,7 @@ def predict_energy():
         processed_data = preprocess_data_from_api(data)
 
         # Make prediction
-        prediction = make_prediction(model, processed_data)
+        prediction = make_prediction(onnx_session, processed_data)
 
 
         result = "The consumption will be lower than production in the next hour." if prediction > 0.5 else "The consumption will not be lower than production in the next hour."
@@ -171,9 +205,9 @@ def get_energy_data():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
     
-@app.route('/past-data', methods=['GET'])
+@app.route('/devices/<device_id>/last_60min', methods=['GET'])
 @token_required
-def get_past_data():
+def get_past_data(device_id):
     """
     Endpoint to get the energy consumption and generation data for the past 60 minutes.
 
@@ -203,24 +237,40 @@ def get_past_data():
         past_data['cet_cest_timestamp'] = past_data['cet_cest_timestamp'].dt.strftime('%Y-%m-%d %H:%M:00')
         
         # Convert the data to JSON
-        response = past_data.to_dict(orient='records')
+        response = {
+            "result": past_data.to_dict(orient='records')
+        }
         
         return jsonify(response)
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-@app.route('/device/control', methods=['POST'])
+@app.route('/devices/<device_id>/switch', methods=['POST'])
 @token_required
-def control_device():
-    # theoretically this endpoint would switch on/off a device based on the prediction
-    # parameters:
-    # device_id: str
-    # action: int (0: off, 1: on)
-    data = request.json
-    message = f"Device {data['device_id']} switched {'on' if data['action'] == 1 else 'off'} successfully."
-    return jsonify({"message": message, "success": True})
+def control_device(device_id):
+    """
+    Endpoint to switch on/off a device based on the prediction.
+
+    :param device_id: Device ID to control.
+    :return: JSON response with the result of the action.
+    """
+    try:
+        data = request.form
+        action = data.get('on')
+        if action not in ['true', 'false']:
+            return jsonify({"error": "Invalid action. Must be 'true' (on) or 'false' (off)."}), 400
+
+        message = f"Device {device_id} switched {'on' if action == 'true' else 'off'} successfully."
+        return jsonify({"message": message, "success": True})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    
+@app.route('/health', methods=['GET'])
+def health_check():
+    return jsonify({"status": "Healthy"})
 
 
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8080)
+

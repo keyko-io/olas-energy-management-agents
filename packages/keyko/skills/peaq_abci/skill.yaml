@@ -7,11 +7,11 @@ license: Apache-2.0
 aea_version: '>=1.0.0, <2.0.0'
 fingerprint:
   __init__.py: bafybeibppyaanwerv6xr5dxhaidvjmxvx3frkmhtbeldaouceytn6kltpu
-  behaviours.py: bafybeie7zjrg7l6zkkhnan5pko5pochaw7ovt3h7ho4hzxjtqe6qfifsg4
+  behaviours.py: bafybeiasjymkissbhzwupgvlqh22tkjz527x3m235bc3mr5ip2b4ybjau4
   dialogues.py: bafybeicko5ws4fdwndjoog5a6hzbmozcc3wmeb3yeqpmamv4d6nuqc5beu
   fsm_specification.yaml: bafybeiggaywshw5bynbyixs2aldlwxpz5j67wxniqtac3tgzucjb5plqwq
   handlers.py: bafybeig66ehy7rmz2xele6om64jykxrdtd6xrz4eim56yj25e45uxu4zgy
-  models.py: bafybeidzfgj4xcncl5l4tcsjrd4mdf666d2yme4hta34naun7jgnh4hnse
+  models.py: bafybeihz3w42v5k4vdeoa4xpzwzf4xvzk6hh3uer7ze4szwek3vmexdniy
   payloads.py: bafybeiey2ig7c53m4rae3djhk5wxzo3jh26763osoqwwwafajq6r32uko4
   rounds.py: bafybeifz3uei2xhcqm3lzzb7z2pcgbyvx3kr5c5qqv6vq2pnkk4w2c54hq
   tests/__init__.py: bafybeifigp64li3j3yidpan5arc27etm3jytadjsckjaidrem57hst73ry
@@ -110,6 +110,9 @@ models:
       model_api_url: http://localhost:8080
       combinder_api_key: null
       model_api_key: null
+      model_id: 6
+      temperature: 33,
+      max_tokens: 23
       solar_device_id: '123456'
       ac_device_id: '123456'
       retry_attempts: 400

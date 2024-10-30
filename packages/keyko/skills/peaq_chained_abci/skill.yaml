@@ -7,11 +7,11 @@ license: Apache-2.0
 aea_version: '>=1.0.0, <2.0.0'
 fingerprint:
   __init__.py: bafybeifnduerlt62gqt6bswu2jjggqbwovylj36t6yedwxvj7jlrsjjl2q
-  behaviours.py: bafybeic3ct32jlv72t2gnivmby774iq3ejgcyblkn2efw7afyffgeevv6m
-  composition.py: bafybeihokcoujxwazv2u5bjfshoa2eirukpukoyybadzyuw5cjhqcjyqcm
+  behaviours.py: bafybeicrh73prqaoomtzz2mzwwgui337ion3fngno43xda7mnodqqkkzgm
+  composition.py: bafybeibuidgkwmlusxjiebh64lqk4pdleinkcvkoom4aemfjlg63m6meqa
   dialogues.py: bafybeiakqfqcpg7yrxt4bsyernhy5p77tci4qhmgqqjqi3ttx7zk6sklca
   handlers.py: bafybeiazvfyfld6ajfsygoy6ahfg27h6hiyhd46ixculhwtz2jlhh3fioe
-  models.py: bafybeidjohbh2yc4twt25krqkhb6dcrqgicntzy6msk7gewgnmgn2zwhce
+  models.py: bafybeifv6afiktnuh4iux5pow57jmracixx4mokduvewve4wkdfq5k7as4
 fingerprint_ignore_patterns: []
 connections: []
 contracts: []
@@ -21,8 +21,7 @@ skills:
 - valory/registration_abci:0.1.0:bafybeiheei5s4rtktdz4ygqeelpcl6rah5jnruhlzjviwspvrvhvdq76w4
 - valory/reset_pause_abci:0.1.0:bafybeifkxpmlxn3wjuleokn6ty7fnvsogshuxp45ihtbqqwi7g4p2ybyki
 - valory/termination_abci:0.1.0:bafybeiggxjbcbarj7cpeuxacll7nlqxf3klj4ytpdvkmj6z67dqohyy3ae
-- keyko/send_api_data_abci:0.1.0:bafybeif4nayrqynis754s2zlzcdj3mwvocc4tbz3k4nkgzylqxugj4ajp4
-- keyko/peaq_abci:0.1.0:bafybeih5h5xefraypf4klj2des7yma7bkdkpgir6xvhwz7g73brojq2evm
+- keyko/peaq_abci:0.1.0:bafybeihji7xisd2p5uvnde2auvagapvdd34re4yvynpo3t2rxbwotbvmfu
 behaviours:
   main:
     args: {}
@@ -141,31 +140,12 @@ models:
       model_api_url: http://localhost:8080
       combinder_api_key: null
       model_api_key: null
+      model_id: 6
+      temperature: 33
+      max_tokens: 23
       number_of_data_points: 60
       solar_device_id: '123456'
       ac_device_id: '123456'
-      project_db_data:
-        project:
-          name: CPI
-          description: CPI Description
-          slug: cpi
-        fsm_suite:
-          name: CPI Suite 1
-          description: CPI FSM Suite 1 description
-          slug: cpi-suite-1
-          fsms:
-          - name: CPI Suite 1 - FSM 1
-            description: CPI Suite 1 - FSM 1 description
-            slug: cpi-suite-1-fsm-1
-          - name: CPI Suite 1 - FSM 2
-            description: CPI Suite 1 - FSM 2 description
-            slug: cpi-suite-1-fsm-2
-        instance:
-          name: CPI Suite 1 - Instance 1
-          slug: cpi-suite-1-instance-1
-      agent_db_name: Agent
-      agent_db_description: Agent Description
-      agent_db_slug: agent
     class_name: Params
   randomness_api:
     args:

@@ -26,7 +26,6 @@ from packages.valory.skills.abstract_round_abci.behaviours import (
     BaseBehaviour,
 )
 from packages.keyko.skills.peaq_abci.behaviours import PeaqRoundBehaviour
-from packages.keyko.skills.send_api_data_abci.behaviours import SendAPIDataRoundBehaviour
 from packages.keyko.skills.peaq_chained_abci.composition import (
     PeaqChainedSkillAbciApp,
 )
@@ -47,7 +46,6 @@ class PeaqChainedConsensusBehaviour(AbstractRoundBehaviour):
     behaviours: Set[Type[BaseBehaviour]] = {
         *AgentRegistrationRoundBehaviour.behaviours,
         *PeaqRoundBehaviour.behaviours,
-        *SendAPIDataRoundBehaviour.behaviours,
         *ResetPauseABCIConsensusBehaviour.behaviours,
         *TerminationAbciBehaviours.behaviours,
     }

@@ -20,7 +20,6 @@
 """This package contains round behaviours of PeaqChainedSkillAbciApp."""
 
 import packages.keyko.skills.peaq_abci.rounds as PeaqAbci
-import packages.keyko.skills.send_api_data_abci.rounds as SendAPIDataAbci
 import packages.valory.skills.registration_abci.rounds as RegistrationAbci
 import packages.valory.skills.reset_pause_abci.rounds as ResetAndPauseAbci
 from packages.valory.skills.abstract_round_abci.abci_app_chain import (
@@ -36,8 +35,7 @@ from packages.valory.skills.termination_abci.rounds import (
 
 abci_app_transition_mapping: AbciAppTransitionMapping = {
     RegistrationAbci.FinishedRegistrationRound: PeaqAbci.CollectDataRound,
-    PeaqAbci.FinishedRound: SendAPIDataAbci.ProjectDataSubmissionDecisionRound,
-    SendAPIDataAbci.FinishedAgentDataSubmissionRound: ResetAndPauseAbci.ResetAndPauseRound,
+    PeaqAbci.FinishedRound: ResetAndPauseAbci.ResetAndPauseRound,
     ResetAndPauseAbci.FinishedResetAndPauseRound: PeaqAbci.CollectDataRound,
     ResetAndPauseAbci.FinishedResetAndPauseErrorRound: PeaqAbci.CollectDataRound,
 }
@@ -52,7 +50,6 @@ PeaqChainedSkillAbciApp = chain(
     (
         RegistrationAbci.AgentRegistrationAbciApp,
         PeaqAbci.PeaqAbciApp,
-        SendAPIDataAbci.SendAPIDataAbciApp,
         ResetAndPauseAbci.ResetPauseAbciApp,
     ),
     abci_app_transition_mapping,

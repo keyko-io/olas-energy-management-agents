@@ -63,15 +63,18 @@ Actionable Insights: The model's output is used by the Olas Agent to make decisi
 The Flask server acts as the backbone of the system, managing API requests and coordinating interactions between the AI model, the autonomous agent, and the physical devices.
 
 ### Endpoints:
+- **/schema.json**: Provides the OpenAPI schema for the API.
 - **/energy-data**: Provides the current energy consumption and production data.
+- **/devices/{device_id}/last_60min**: Returns energy data for the past 60 minutes for a specific device.
+- **/devices/{device_id}/switch**: Controls a device based on the prediction (e.g., switching on/off).
 - **/past-data**: Returns energy data from the past 60 minutes.
-- **/predict-energy**: Receives the last 60 minutes of energy data and returns a prediction on whether production will exceed consumption in the next hour.
+- **/predict**: Receives the last 60 minutes of energy data and returns a prediction on whether production will exceed consumption in the next hour.
 
 The server ensures that all components of the system work seamlessly together, enabling real-time energy management and optimization.
 
 ## System requirements
 
-- Python `>=3.8`
+- Python `3.10`
 - [Tendermint](https://docs.tendermint.com/v0.34/introduction/install.html) `==0.34.19`
 - [IPFS node](https://docs.ipfs.io/install/command-line/#official-distributions) `==0.6.0`
 - [Pip](https://pip.pypa.io/en/stable/installation/)
@@ -89,9 +92,8 @@ docker container run -it valory/open-autonomy-user:latest
 ```
 
 ## This repository contains:
- ```bash
- TODO
- ```
+ - OLAS Agent
+ - Proof of Concept folder with a sample server, the model and some Jupyter Notebooks with data analysis for model creation
 
 ## How to use
 
@@ -100,4 +102,17 @@ Create a virtual environment with all development dependencies:
 ```bash
 poetry shell
 poetry install
+```
+
+Fill a `.env` file located in the root of this project with the following environment variables:
+
+```bash
+RESET_PAUSE_DURATION=60
+COMBINDER_API_URL="THE COMBINDER API URL PROVIDED"
+COMBINDER_API_KEY="THE COMBINDER API KEY PROVIDED"
+COMBINDER_SOLAR_DEVICE_ID="THE COMBINDER SOLAR DEVICE ID PROVIDED"
+COMBINDER_AC_DEVICE_ID="THE COMBINDER AC UNIT ID PROVIDED"
+MODEL_API_URL="MODEL API URL PROVIDED BY AIZEL"
+MODEL_API_KEY="MODEL API KEY PROVIDED BY AIZEL"
+MODEL_ID="MODEL ID PROVIDED BY AIZEL"
 ```

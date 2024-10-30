@@ -46,6 +46,16 @@ from packages.keyko.skills.peaq_abci.rounds import (
 )
 
 
+LOG_FILE_PATH = "peaq_agent.log"
+
+def log_message(message: str, data: str = ""):
+    """Write a log message to the log file."""
+    with open(LOG_FILE_PATH, "a") as log_file:
+        log_entry = f"{datetime.now().isoformat()} - {message}"
+        if data:
+            log_entry += f" - Data: {data}"
+        log_file.write(log_entry + "\n")
+
 class PeaqBaseBehaviour(BaseBehaviour, ABC):
     """Base behaviour for the peaq_abci skill."""
 
@@ -66,6 +76,7 @@ class CollectDataBehaviour(PeaqBaseBehaviour):
 
     def async_act(self) -> Generator:
         """Do the act, supporting asynchronous execution."""
+        log_message("Collecting data from Combinder API")
 
         with self.context.benchmark_tool.measure(self.behaviour_id).local():
             solar_data = yield from self.get_combinder_past_data(self.params.solar_device_id)
@@ -82,6 +93,7 @@ class CollectDataBehaviour(PeaqBaseBehaviour):
 
 
             sender = self.context.agent_address
+            log_message("Combinder API data collected")
             self.context.logger.info(f"CollectDataBehaviour: Combined data: {combined_data}")
             payload = CollectDataPayload(sender=sender, prosumer_data=combined_data)
 
@@ -95,6 +107,7 @@ class CollectDataBehaviour(PeaqBaseBehaviour):
         """
         Get the data from Combinder API which contains the power production and consumption data.
         """
+        log_message(f"Retrieving last data from Combinder API for device {device_id}")
         url = f"{self.params.combinder_api_url}/devices/{device_id}/last_60min"
         response = yield from self.get_http_response(
             method="GET",
@@ -112,6 +125,7 @@ class CollectDataBehaviour(PeaqBaseBehaviour):
             return ""
         
         data = json.loads(response.body)['result']
+        log_message(f"Data retrieved from Combinder API for device {device_id}")
         
         return data
     
@@ -129,9 +143,12 @@ class QueryModelBehaviour(PeaqBaseBehaviour):
     def async_act(self) -> Generator:
         """Do the act, supporting asynchronous execution."""
         # Step 2: Query the model to get the prediction
+        log_message("Gathering results from the model")
 
         with self.context.benchmark_tool.measure(self.behaviour_id).local():
             model_prediction = yield from self.query_model()
+            action_str = "on" if model_prediction else "off"
+            log_message(f"Model prediction obtained: Turn {action_str} device")
             self.context.logger.info(f"QueryModelBehaviour: Model prediction: {model_prediction}")
 
             sender = self.context.agent_address
@@ -146,8 +163,15 @@ class QueryModelBehaviour(PeaqBaseBehaviour):
     def query_model(self):
         # Query the model with synchronized data
         url = self.params.model_api_url + f"/predict"
+
         http_params = {
-            "data": self.synchronized_data.prosumer_data
+            "model_id": self.params.model_id,
+            "user_input": {
+                "data": self.synchronized_data.prosumer_data
+            },
+            "system_prompt": "none",
+            "temperature": self.params.temperature,
+            "max_tokens" : self.params.max_tokens
         }
         response = yield from self.get_http_response(
             method="POST",
@@ -183,13 +207,17 @@ class DeviceInteractionBehaviour(PeaqBaseBehaviour):
 
         with self.context.benchmark_tool.measure(self.behaviour_id).local():
             device_action = bool(self.synchronized_data.last_prediction_class)
-            ret = yield from self.control_device(self.params.ac_device_id, device_action)
+            action_str = "on" if device_action else "off"
+            log_message(f"Switching {action_str} Air Conditioning Unit with device id {self.params.ac_device_id}")
 
+            ret = yield from self.control_device(self.params.ac_device_id, device_action)
             sender = self.context.agent_address
             # If ret["result"] is {} then the device was controlled successfully
             success = True if ret["result"] == {} else False
             message = ret["message"] if "success" in ret and ret["success"] == False else "Device controlled successfully."
-
+            log_message("Device control response", data=message)
+            log_message("Put agent into sleep for 1 minute...")
+        
             payload = DeviceInteractionPayload(sender=sender, success=success, message=message)
 
         with self.context.benchmark_tool.measure(self.behaviour_id).consensus():
