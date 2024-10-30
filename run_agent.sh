@@ -23,7 +23,7 @@ cp $PWD/../ethereum_private_key.txt .
 autonomy add-key ethereum ethereum_private_key.txt
 autonomy issue-certificates
 
-#touch peaq_agent.log
+touch peaq_agent.log
 
 # Run the agent
 aea -s run
