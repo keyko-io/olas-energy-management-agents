@@ -116,3 +116,13 @@ MODEL_API_URL="MODEL API URL PROVIDED BY AIZEL"
 MODEL_API_KEY="MODEL API KEY PROVIDED BY AIZEL"
 MODEL_ID="MODEL ID PROVIDED BY AIZEL"
 ```
+
+Run in parallel the tendermint node and the agent:
+
+```bash
+rm -r ~/.tendermint && tendermint init && tendermint node --proxy_app=tcp://127.0.0.1:26658 --rpc.laddr=tcp://127.0.0.1:26657 --p2p.laddr=tcp://0.0.0.0:26656 --p2p.seeds= --consensus.create_empty_blocks=true
+```
+
+```bash
+./run_agent.sh
+```
